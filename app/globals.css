@@ -1,26 +1,190 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* 60% Warm Ivory/Cream */
+  --ivory: #f3ebe1;
+  --ivory-deep: #e8dccf;
+  /* 25% White/Cream cards */
+  --card: #fffcf8;
+  --card-muted: #faf6f0;
+  /* 10% Terracotta Orange */
+  --terracotta: #c45c26;
+  --terracotta-dark: #a3491c;
+  --terracotta-soft: #e8a078;
+  /* 5% Green */
+  --leaf: #3f7a4a;
+  --leaf-soft: #5a9a66;
+  --ink: #1c1917;
+  --muted: #6b635a;
+  --line: #e5d9cc;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-ivory: var(--ivory);
+  --color-ivory-deep: var(--ivory-deep);
+  --color-card: var(--card);
+  --color-card-muted: var(--card-muted);
+  --color-terracotta: var(--terracotta);
+  --color-terracotta-dark: var(--terracotta-dark);
+  --color-terracotta-soft: var(--terracotta-soft);
+  --color-leaf: var(--leaf);
+  --color-leaf-soft: var(--leaf-soft);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --font-sans: var(--font-roboto), "Roboto", ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-roboto), "Roboto", ui-sans-serif, system-ui, sans-serif;
+  --font-headline: var(--font-roboto), "Roboto", ui-sans-serif, system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--ivory);
+  color: var(--ink);
+  font-family: var(--font-roboto), "Roboto", ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: 0.01em;
 }
+
+.font-display {
+  font-family: var(--font-roboto), "Roboto", ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: -0.01em;
+}
+
+.font-headline {
+  font-family: var(--font-roboto), "Roboto", ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: 0.02em;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--terracotta) 28%, white);
+  color: var(--ink);
+}
+
+@keyframes ticker {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-ticker {
+  animation: ticker 28s linear infinite;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.7s ease-out both;
+}
+
+.animate-fade-up-delay {
+  animation: fade-up 0.7s ease-out 0.15s both;
+}
+
+.animate-fade-up-delay-2 {
+  animation: fade-up 0.7s ease-out 0.28s both;
+}
+
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--terracotta-soft) transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  height: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: var(--terracotta-soft);
+  border-radius: 999px;
+}
+
+@keyframes hang-swing {
+  0% {
+    transform: rotate(-8deg);
+  }
+  50% {
+    transform: rotate(8deg);
+  }
+  100% {
+    transform: rotate(-8deg);
+  }
+}
+
+.animate-hang {
+  transform-origin: top center;
+  animation: hang-swing 2.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-hang {
+    animation: none;
+  }
+}
+
+.field-pill {
+  width: 100%;
+  border-radius: 9999px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  padding: 0.8rem 1rem 0.8rem 2.75rem;
+  font-size: 0.9rem;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.field-pill:focus {
+  border-color: var(--terracotta);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--terracotta) 18%, transparent);
+}
+
+@keyframes marquee-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-33.333%);
+  }
+}
+
+@keyframes marquee-right {
+  from {
+    transform: translateX(-33.333%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-marquee-left {
+  animation: marquee-left 40s linear infinite;
+}
+
+.animate-marquee-right {
+  animation: marquee-right 40s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee-left,
+  .animate-marquee-right {
+    animation: none;
+  }
+}
+
+
+
