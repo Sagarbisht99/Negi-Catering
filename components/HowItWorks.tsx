@@ -25,14 +25,14 @@ export default function HowItWorks() {
   return (
     <section
       id="how-it-works"
-      className="relative border-y border-line bg-ivory-deep/50 py-14 md:py-20"
+      className="relative border-y border-line bg-ivory-deep/50 py-10 md:py-20"
     >
-      <div className="mx-auto max-w-7xl px-4 md:px-6">
+      <div className="mx-auto max-w-7xl px-3 sm:px-4 md:px-6">
         <div className="mx-auto max-w-3xl text-center">
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-terracotta">
             Our Process
           </p>
-          <h2 className="mt-3 font-display text-3xl font-semibold text-ink md:text-5xl">
+          <h2 className="mt-3 font-display text-2xl font-semibold text-ink sm:text-3xl md:text-5xl">
             From first enquiry to{" "}
             <span className="text-terracotta">happy guests</span>
           </h2>
@@ -42,7 +42,7 @@ export default function HowItWorks() {
           </p>
         </div>
 
-        <div className="mt-14 grid gap-10 md:grid-cols-2 lg:grid-cols-4 lg:gap-x-0">
+        <div className="mt-10 grid grid-cols-1 gap-8 sm:mt-14 sm:grid-cols-2 sm:gap-10 lg:grid-cols-4 lg:gap-x-0">
           {steps.map((step, index) => (
             <div key={step.n} className="relative text-center">
               <div className="relative mx-auto h-[72px] w-full">
@@ -92,7 +92,7 @@ export default function HowItWorks() {
 
               {index < steps.length - 1 ? (
                 <div
-                  className="mt-4 flex justify-center text-terracotta lg:hidden"
+                  className="mt-4 flex justify-center text-terracotta sm:hidden"
                   aria-hidden
                 >
                   <svg width="28" height="40" viewBox="0 0 28 40" fill="none">

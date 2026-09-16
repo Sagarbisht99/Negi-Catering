@@ -1,54 +1,46 @@
 "use client";
 
 import { occasions, type Occasion } from "@/data/occasions";
+import { useSubmitEnquiry } from "@/lib/publicQueries";
+import { useEnquiry } from "@/components/EnquiryProvider";
 import { FormEvent, useState } from "react";
 
 const fieldClass =
   "w-full rounded-xl border border-line bg-card px-3.5 py-2.5 text-sm text-ink outline-none transition focus:border-terracotta focus:ring-2 focus:ring-terracotta/20";
 
+const empty = {
+  name: "",
+  email: "",
+  mobile: "",
+  event: "" as Occasion | "",
+  guests: "",
+};
+
 export default function ContactForm() {
-  const [sent, setSent] = useState(false);
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    mobile: "",
-    event: "" as Occasion | "",
-    guests: "",
-    message: "",
-  });
+  const { submitted, notifyEnquirySuccess } = useEnquiry();
+  const submit = useSubmitEnquiry();
+  const [error, setError] = useState("");
+  const [form, setForm] = useState(empty);
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
-    setSent(true);
+    setError("");
+    submit.mutate(
+      {
+        ...form,
+        event: form.event,
+        source: "contact",
+      },
+      {
+        onSuccess: () => notifyEnquirySuccess(),
+        onError: (err) => {
+          setError(err instanceof Error ? err.message : "Something went wrong");
+        },
+      },
+    );
   };
 
-  if (sent) {
-    return (
-      <div className="rounded-2xl bg-card px-6 py-12 text-center shadow-sm ring-1 ring-line">
-        <p className="font-display text-3xl font-semibold text-ink">Thank you!</p>
-        <p className="mt-2 text-sm text-muted">
-          Your message has been received. We&apos;ll get back to you soon.
-        </p>
-        <button
-          type="button"
-          onClick={() => {
-            setSent(false);
-            setForm({
-              name: "",
-              email: "",
-              mobile: "",
-              event: "",
-              guests: "",
-              message: "",
-            });
-          }}
-          className="mt-6 rounded-full bg-terracotta px-5 py-2.5 text-sm font-bold text-white"
-        >
-          Send another message
-        </button>
-      </div>
-    );
-  }
+  if (submitted) return null;
 
   return (
     <form
@@ -119,7 +111,7 @@ export default function ContactForm() {
         </label>
         <label className="block md:col-span-2">
           <span className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-muted">
-            Kitne logo ka khana?
+            Number of Guests
           </span>
           <input
             required
@@ -128,27 +120,21 @@ export default function ContactForm() {
             className={fieldClass}
             value={form.guests}
             onChange={(e) => setForm({ ...form, guests: e.target.value })}
-            placeholder="Number of guests"
-          />
-        </label>
-        <label className="block md:col-span-2">
-          <span className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-muted">
-            Message
-          </span>
-          <textarea
-            rows={4}
-            className={fieldClass}
-            value={form.message}
-            onChange={(e) => setForm({ ...form, message: e.target.value })}
-            placeholder="Date, location, menu preferences..."
+            placeholder="How many people?"
           />
         </label>
       </div>
+      {error ? (
+        <p className="rounded-xl bg-terracotta/10 px-3 py-2 text-sm font-semibold text-terracotta">
+          {error}
+        </p>
+      ) : null}
       <button
         type="submit"
-        className="w-full rounded-xl bg-terracotta py-3 text-sm font-bold uppercase tracking-wide text-white transition hover:bg-terracotta-dark md:w-auto md:px-10"
+        disabled={submit.isPending}
+        className="w-full rounded-xl bg-terracotta py-3 text-sm font-bold uppercase tracking-wide text-white transition hover:bg-terracotta-dark disabled:opacity-60 md:w-auto md:px-10"
       >
-        Send Message
+        {submit.isPending ? "Sending..." : "Send Enquiry"}
       </button>
     </form>
   );

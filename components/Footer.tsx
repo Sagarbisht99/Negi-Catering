@@ -3,16 +3,10 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default function Footer() {
-  const social = [
-    { label: "Instagram", href: site.social.instagram },
-    { label: "Facebook", href: site.social.facebook },
-    { label: "YouTube", href: site.social.youtube },
-  ];
-
   const explore = [
     { label: "Our Food", href: "/gallery" },
-    { label: "Services", href: "/#services" },
-    { label: "Our Process", href: "/#how-it-works" },
+    { label: "Services", href: "/services" },
+    { label: "FAQ", href: "/#faq" },
     { label: "About Us", href: "/about" },
   ];
 
@@ -40,8 +34,8 @@ export default function Footer() {
           }}
         />
 
-        <div className="relative mx-auto max-w-7xl px-4 pt-12 md:px-6 md:pt-14">
-          <div className="mb-10 overflow-hidden rounded-[24px] bg-terracotta px-6 py-7 text-white shadow-lg shadow-terracotta/20 md:flex md:items-center md:justify-between md:px-8">
+        <div className="relative mx-auto max-w-7xl px-3 pt-10 sm:px-4 md:px-6 md:pt-14">
+          <div className="mb-10 overflow-hidden rounded-[24px] bg-terracotta px-5 py-6 text-white shadow-lg shadow-terracotta/20 sm:px-6 sm:py-7 md:flex md:items-center md:justify-between md:px-8">
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/80">
                 {site.brand.sinceLabel}
@@ -71,8 +65,8 @@ export default function Footer() {
             </div>
           </div>
 
-          <div className="grid gap-10 pb-12 md:grid-cols-2 lg:grid-cols-12">
-            <div className="lg:col-span-4">
+          <div className="grid grid-cols-2 gap-8 pb-10 lg:grid-cols-12 lg:gap-10 lg:pb-12">
+            <div className="col-span-2 lg:col-span-4">
               <Link href="/" className="inline-flex items-center gap-3">
                 <Image
                   src={site.brand.logo}
@@ -88,19 +82,17 @@ export default function Footer() {
               <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted">
                 {site.brand.description}
               </p>
-              <div className="mt-5 flex gap-2">
-                {social.map((s) => (
-                  <a
-                    key={s.label}
-                    href={s.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex h-10 w-10 items-center justify-center rounded-full bg-terracotta/10 text-xs font-bold text-terracotta ring-1 ring-terracotta/20 transition hover:bg-terracotta hover:text-white"
-                    title={s.label}
-                  >
-                    {s.label.charAt(0)}
-                  </a>
-                ))}
+              <div className="mt-5">
+                <a
+                  href={site.social.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                  title="Instagram"
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-terracotta/10 text-terracotta ring-1 ring-terracotta/20 transition hover:bg-terracotta hover:text-white"
+                >
+                  <InstagramIcon />
+                </a>
               </div>
             </div>
 
@@ -195,5 +187,23 @@ export default function Footer() {
         </div>
       </div>
     </footer>
+  );
+}
+
+function InstagramIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <rect
+        x="3.5"
+        y="3.5"
+        width="17"
+        height="17"
+        rx="5"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      />
+      <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="1.8" />
+      <circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" />
+    </svg>
   );
 }

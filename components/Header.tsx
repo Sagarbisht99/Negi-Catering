@@ -10,15 +10,15 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 const nav = [
-  { label: "How It Works", href: "/#how-it-works" },
   { label: "About Us", href: "/about" },
   { label: "Gallery", href: "/gallery" },
+  { label: "FAQ", href: "/#faq" },
   { label: "Contact Us", href: "/contact" },
 ];
 
 export default function Header() {
   const pathname = usePathname();
-  const { openEnquiry } = useEnquiry();
+  const { openEnquiry, submitted } = useEnquiry();
   const [open, setOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
   const [hash, setHash] = useState("");
@@ -31,25 +31,15 @@ export default function Header() {
     return () => window.removeEventListener("hashchange", sync);
   }, [pathname]);
 
-  useEffect(() => {
-    const onClick = (e: MouseEvent) => {
-      if (!dropdownRef.current?.contains(e.target as Node)) {
-        setServicesOpen(false);
-      }
-    };
-    window.addEventListener("mousedown", onClick);
-    return () => window.removeEventListener("mousedown", onClick);
-  }, []);
-
   const isActive = (href: string) => {
-    if (href === "/about") return pathname === "/about";
-    if (href === "/gallery") return pathname === "/gallery";
-    if (href === "/contact") return pathname === "/contact";
-    if (pathname !== "/") return false;
-    return hash === href.replace("/", "");
+    if (href.startsWith("/#")) {
+      if (pathname !== "/") return false;
+      return hash === href.replace("/", "");
+    }
+    return pathname === href;
   };
 
-  const servicesActive = pathname === "/" && (hash === "#services" || hash === "");
+  const servicesActive = pathname === "/services";
 
   const linkClass = (active: boolean) =>
     [
@@ -77,11 +67,11 @@ export default function Header() {
             className="h-12 w-auto object-contain md:h-14"
             priority
           />
-          <span className="hidden sm:flex flex-col leading-none">
-            <span className="font-display text-xl font-semibold tracking-tight text-ink md:text-2xl">
+          <span className="flex min-w-0 flex-col leading-none">
+            <span className="font-display text-lg font-semibold tracking-tight text-ink sm:text-xl md:text-2xl">
               {site.brand.shortName}
             </span>
-            <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-terracotta">
+            <span className="text-[9px] font-semibold uppercase tracking-[0.12em] text-terracotta sm:text-[10px] sm:tracking-[0.14em]">
               {site.brand.tagline}
             </span>
           </span>
@@ -98,28 +88,47 @@ export default function Header() {
         </div>
 
         <nav className="ml-auto hidden items-center gap-1.5 lg:flex">
-          <div className="relative" ref={dropdownRef}>
+          <Link
+            href="/services"
+            className={linkClass(servicesActive)}
+            aria-current={servicesActive ? "page" : undefined}
+          >
+            Services
+          </Link>
+
+          <div
+            className="relative"
+            ref={dropdownRef}
+            onMouseEnter={() => setServicesOpen(true)}
+            onMouseLeave={() => setServicesOpen(false)}
+          >
             <button
               type="button"
-              className={linkClass(servicesActive || servicesOpen)}
+              className={linkClass(false)}
               aria-expanded={servicesOpen}
-              onClick={() => setServicesOpen((v) => !v)}
+              aria-haspopup="menu"
             >
-              Our Services
+              Occasions
               <Chevron />
             </button>
             {servicesOpen ? (
-              <div className="absolute top-full left-0 z-50 mt-2 w-52 overflow-hidden rounded-2xl bg-card py-2 shadow-lg ring-1 ring-line">
-                {occasions.map((item) => (
-                  <button
-                    key={item}
-                    type="button"
-                    className="block w-full px-4 py-2.5 text-left text-sm font-semibold text-ink transition hover:bg-terracotta/10 hover:text-terracotta"
-                    onClick={() => pickOccasion(item)}
-                  >
-                    {item}
-                  </button>
-                ))}
+              <div className="absolute top-full left-0 z-50 pt-2">
+                <div
+                  role="menu"
+                  className="w-52 overflow-hidden rounded-2xl bg-card py-2 shadow-lg ring-1 ring-line"
+                >
+                  {occasions.map((item) => (
+                    <button
+                      key={item}
+                      type="button"
+                      role="menuitem"
+                      className="block w-full px-4 py-2.5 text-left text-sm font-semibold text-ink transition hover:bg-terracotta/10 hover:text-terracotta"
+                      onClick={() => pickOccasion(item)}
+                    >
+                      {item}
+                    </button>
+                  ))}
+                </div>
               </div>
             ) : null}
           </div>
@@ -141,17 +150,21 @@ export default function Header() {
           ))}
         </nav>
 
-        <div className="relative ml-auto flex items-center gap-2 lg:ml-0">
-          <div className="relative hidden items-center sm:flex">
-            <button
-              type="button"
-              onClick={() => openEnquiry()}
-              className="font-headline inline-flex items-center rounded-full bg-terracotta px-4 py-2 text-[11px] font-extrabold uppercase tracking-[0.06em] text-white shadow-sm shadow-terracotta/25 transition hover:bg-terracotta-dark md:text-xs"
-            >
-              Get a Quote
-            </button>
-            <EnquiryHangTag onClick={() => openEnquiry()} />
-          </div>
+        <div className="relative ml-auto flex items-center gap-1.5 sm:gap-2 lg:ml-0">
+          {!submitted ? (
+            <div className="relative flex items-center">
+              <button
+                type="button"
+                onClick={() => openEnquiry()}
+                className="font-headline inline-flex items-center rounded-full bg-terracotta px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.06em] text-white shadow-sm shadow-terracotta/25 transition hover:bg-terracotta-dark sm:px-4 sm:py-2 sm:text-[11px] md:text-xs"
+              >
+                Get a Quote
+              </button>
+              <span className="hidden md:contents">
+                <EnquiryHangTag onClick={() => openEnquiry()} />
+              </span>
+            </div>
+          ) : null}
           <button
             type="button"
             className="rounded-lg p-2 text-ink lg:hidden"
@@ -164,10 +177,13 @@ export default function Header() {
       </div>
 
       {open ? (
-        <div className="border-t border-line bg-card px-4 py-3 lg:hidden">
+        <div className="scrollbar-thin max-h-[min(80dvh,560px)] overflow-y-auto border-t border-line bg-card px-4 py-3 lg:hidden">
           <nav className="flex flex-col gap-1.5">
+            <p className="px-3.5 pb-1 text-xs text-muted">
+              Available in <span className="font-semibold text-terracotta">{site.location.label}</span>
+            </p>
             <p className="px-3.5 pt-1 text-[11px] font-bold uppercase tracking-wide text-muted">
-              Our Services
+              Occasions
             </p>
             {occasions.map((item) => (
               <button
@@ -180,6 +196,14 @@ export default function Header() {
               </button>
             ))}
             <div className="my-1 border-t border-line" />
+            <Link
+              href="/services"
+              className={linkClass(servicesActive)}
+              aria-current={servicesActive ? "page" : undefined}
+              onClick={() => setOpen(false)}
+            >
+              Services
+            </Link>
             {nav.map((item) => (
               <Link
                 key={item.label}
@@ -196,6 +220,18 @@ export default function Header() {
                 {item.label}
               </Link>
             ))}
+            {submitted ? null : (
+              <button
+                type="button"
+                onClick={() => {
+                  setOpen(false);
+                  openEnquiry();
+                }}
+                className="mt-2 rounded-full bg-terracotta px-3.5 py-2.5 text-sm font-bold text-white"
+              >
+                Get a Quote
+              </button>
+            )}
           </nav>
         </div>
       ) : null}

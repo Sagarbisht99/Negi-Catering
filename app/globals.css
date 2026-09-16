@@ -32,29 +32,31 @@
   --color-ink: var(--ink);
   --color-muted: var(--muted);
   --color-line: var(--line);
-  --font-sans: var(--font-roboto), "Roboto", ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-roboto), "Roboto", ui-sans-serif, system-ui, sans-serif;
-  --font-headline: var(--font-roboto), "Roboto", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-rubik), "Rubik", ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-rubik), "Rubik", ui-sans-serif, system-ui, sans-serif;
+  --font-headline: var(--font-rubik), "Rubik", ui-sans-serif, system-ui, sans-serif;
 }
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
   background: var(--ivory);
   color: var(--ink);
-  font-family: var(--font-roboto), "Roboto", ui-sans-serif, system-ui, sans-serif;
-  letter-spacing: 0.01em;
+  font-family: var(--font-rubik), "Rubik", ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: -0.01em;
+  overflow-x: hidden;
 }
 
 .font-display {
-  font-family: var(--font-roboto), "Roboto", ui-sans-serif, system-ui, sans-serif;
-  letter-spacing: -0.01em;
+  font-family: var(--font-rubik), "Rubik", ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: -0.03em;
 }
 
 .font-headline {
-  font-family: var(--font-roboto), "Roboto", ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-rubik), "Rubik", ui-sans-serif, system-ui, sans-serif;
   letter-spacing: 0.02em;
 }
 
@@ -95,22 +97,73 @@ body {
   animation: fade-up 0.7s ease-out 0.15s both;
 }
 
+@keyframes enquiry-success-bar {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+.enquiry-success-bar {
+  width: 100%;
+  animation: enquiry-success-bar 4.5s linear forwards;
+}
+
 .animate-fade-up-delay-2 {
   animation: fade-up 0.7s ease-out 0.28s both;
 }
 
 .scrollbar-thin {
   scrollbar-width: thin;
-  scrollbar-color: var(--terracotta-soft) transparent;
+  scrollbar-color: color-mix(in srgb, var(--terracotta) 45%, #d4c4b4) transparent;
 }
 
 .scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
   height: 6px;
 }
 
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+  margin-block: 12px;
+}
+
 .scrollbar-thin::-webkit-scrollbar-thumb {
-  background: var(--terracotta-soft);
+  background: color-mix(in srgb, var(--terracotta) 40%, #d4c4b4);
   border-radius: 999px;
+  border: 1px solid transparent;
+  background-clip: padding-box;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: var(--terracotta-soft);
+}
+
+/* Dark admin modals / panels */
+.scrollbar-admin {
+  scrollbar-width: thin;
+  scrollbar-color: #3f3f46 transparent;
+}
+
+.scrollbar-admin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.scrollbar-admin::-webkit-scrollbar-track {
+  background: transparent;
+  margin-block: 10px;
+}
+
+.scrollbar-admin::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+  border-radius: 999px;
+}
+
+.scrollbar-admin::-webkit-scrollbar-thumb:hover {
+  background: #52525b;
 }
 
 @keyframes hang-swing {

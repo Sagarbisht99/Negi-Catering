@@ -3,31 +3,31 @@ import { site } from "@/data/site";
 const reviews = [
   {
     name: "Ananya Sharma",
-    role: "Housewarming · Delhi",
+    role: "Housewarming · Delhi NCR",
     rating: 5,
     text: "Negi Caterers made our housewarming effortless. The food tasted like home, and guests kept asking for the caterer's number.",
   },
   {
     name: "Rohit Mehra",
-    role: "Daily Tiffin · Noida",
+    role: "Daily Tiffin · Delhi NCR",
     rating: 5,
     text: "We've used their tiffin for years. Consistent quality, on-time delivery, and thoughtful packaging every single day.",
   },
   {
     name: "Priya Nair",
-    role: "Office Party · Gurgaon",
+    role: "Office Party · Delhi NCR",
     rating: 5,
     text: "Our office Diwali lunch was a hit — beautiful presentation, generous portions, and the live counter was a crowd favourite.",
   },
   {
     name: "Vikram Singh",
-    role: "Anniversary · Faridabad",
+    role: "Anniversary · Delhi NCR",
     rating: 5,
     text: "Booked them for my parents' anniversary. Traditional flavours done right. Warm service from start to finish.",
   },
   {
     name: "Meera Joshi",
-    role: "Pooja · Delhi",
+    role: "Pooja · Delhi NCR",
     rating: 5,
     text: "From menu planning to cleanup, everything was smooth. Highly recommend for family poojas and festive gatherings.",
   },
@@ -46,13 +46,13 @@ export default function Testimonials() {
   const { rating, count, googleUrl } = site.reviews;
 
   return (
-    <section className="overflow-hidden border-y border-line bg-ivory-deep/50 py-14 md:py-16">
-      <div className="mx-auto max-w-7xl px-4 md:px-6">
+    <section className="overflow-hidden border-y border-line bg-ivory-deep/50 py-10 md:py-16">
+      <div className="mx-auto max-w-7xl px-3 sm:px-4 md:px-6">
         <div className="relative mx-auto max-w-3xl text-center">
-          <span className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 font-display text-7xl leading-none text-terracotta/20 select-none md:text-8xl">
+          <span className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 font-display text-6xl leading-none text-terracotta/20 select-none md:text-8xl">
             “
           </span>
-          <h2 className="relative font-display text-4xl font-semibold text-ink md:text-5xl">
+          <h2 className="relative font-display text-3xl font-semibold text-ink md:text-5xl">
             Real Stories from{" "}
             <span className="text-terracotta">Real Customers</span>
           </h2>
@@ -60,10 +60,10 @@ export default function Testimonials() {
             Get inspired by these stories.
           </p>
 
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-            <div className="inline-flex items-center gap-2 rounded-full bg-card px-4 py-2 shadow-sm ring-1 ring-line">
+          <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row sm:flex-wrap">
+            <div className="inline-flex max-w-full items-center gap-2 rounded-full bg-card px-3 py-2 shadow-sm ring-1 ring-line sm:px-4">
               <Stars value={rating} size="md" />
-              <p className="text-sm font-semibold text-ink">
+              <p className="text-xs font-semibold text-ink sm:text-sm">
                 {rating.toFixed(1)} · {count} reviews on Google
               </p>
             </div>
@@ -127,7 +127,7 @@ function MarqueeRow({
 
 function ReviewCard({ review }: { review: (typeof reviews)[number] }) {
   return (
-    <article className="flex w-[320px] shrink-0 flex-col rounded-2xl bg-card p-5 shadow-sm ring-1 ring-line md:w-[360px]">
+    <article className="flex w-[min(300px,calc(100vw-2rem))] shrink-0 flex-col rounded-2xl bg-card p-5 shadow-sm ring-1 ring-line md:w-[360px]">
       <span className="font-display text-3xl leading-none text-terracotta/50">“</span>
       <p className="mt-2 flex-1 text-sm leading-relaxed text-ink/85">
         {review.text}

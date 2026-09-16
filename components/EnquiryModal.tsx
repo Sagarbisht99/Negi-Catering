@@ -1,7 +1,9 @@
 "use client";
 
+import { useEnquiry } from "@/components/EnquiryProvider";
 import { occasions, type Occasion } from "@/data/occasions";
 import { site } from "@/data/site";
+import { useSubmitEnquiry } from "@/lib/publicQueries";
 import Image from "next/image";
 import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
@@ -21,13 +23,15 @@ const empty = {
 };
 
 export default function EnquiryModal({ open, initialEvent = "", onClose }: Props) {
+  const { notifyEnquirySuccess } = useEnquiry();
+  const submit = useSubmitEnquiry();
   const [form, setForm] = useState(empty);
-  const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!open) return;
     setForm({ ...empty, event: initialEvent });
-    setSent(false);
+    setError("");
     document.body.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -43,195 +47,191 @@ export default function EnquiryModal({ open, initialEvent = "", onClose }: Props
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
-    setSent(true);
+    setError("");
+    submit.mutate(
+      {
+        ...form,
+        event: form.event,
+        source: "popup",
+      },
+      {
+        onSuccess: () => notifyEnquirySuccess(),
+        onError: (err) => {
+          setError(err instanceof Error ? err.message : "Something went wrong");
+        },
+      },
+    );
   };
 
   return (
     <div
-      className="fixed inset-0 z-[120] flex items-center justify-center bg-ink/70 p-4 backdrop-blur-md"
+      className="fixed inset-0 z-[120] flex items-end justify-center bg-ink/70 p-0 backdrop-blur-md sm:items-center sm:p-4"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-label="Enquiry form"
     >
       <div
-        className="relative w-full max-w-[420px] overflow-hidden rounded-[28px] bg-gradient-to-b from-card via-card to-[#fff7f0] p-6 shadow-2xl ring-1 ring-line md:p-7"
+        className="relative flex max-h-[min(92dvh,760px)] w-full flex-col overflow-hidden rounded-t-[28px] bg-gradient-to-b from-card via-card to-[#fff7f0] shadow-2xl ring-1 ring-line sm:max-w-[420px] sm:rounded-[28px]"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           type="button"
           aria-label="Close"
           onClick={onClose}
-          className="absolute top-4 right-4 flex h-9 w-9 items-center justify-center rounded-full bg-ivory text-lg text-muted transition hover:bg-ivory-deep hover:text-ink"
+          className="absolute top-4 right-4 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-ivory/95 text-lg text-muted shadow-sm ring-1 ring-line transition hover:bg-ivory-deep hover:text-ink"
         >
           ×
         </button>
 
-        {sent ? (
-          <div className="py-10 text-center">
-            <Image
-              src={site.brand.logo}
-              alt={site.brand.name}
-              width={72}
-              height={66}
-              className="mx-auto h-16 w-auto object-contain"
-            />
-            <p className="mt-4 font-display text-3xl font-semibold text-ink">
-              Thank you!
-            </p>
-            <p className="mt-2 text-sm text-muted">
-              We received your enquiry. Our team will contact you shortly.
+        <div className="shrink-0 border-b border-line/70 px-5 pb-4 pt-5 text-center md:px-7 md:pt-7">
+          <Image
+            src={site.brand.logo}
+            alt={site.brand.name}
+            width={80}
+            height={74}
+            className="mx-auto h-[64px] w-auto object-contain"
+            priority
+          />
+          <h2 className="mt-2 font-display text-[1.5rem] font-semibold leading-tight text-ink sm:text-[1.65rem]">
+            Let&apos;s plan your catering
+          </h2>
+          <p className="mt-1 text-sm text-muted">
+            Free enquiry with {site.brand.name}
+          </p>
+        </div>
+
+        <form onSubmit={onSubmit} className="flex min-h-0 flex-1 flex-col">
+          <div className="scrollbar-thin min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain px-5 py-4 md:px-7">
+            <label className="relative block">
+              <span className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-terracotta">
+                <UserIcon />
+              </span>
+              <input
+                required
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                className="field-pill"
+                placeholder="Enter Your Name *"
+              />
+            </label>
+
+            <label className="relative block">
+              <span className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-terracotta">
+                <MailIcon />
+              </span>
+              <input
+                required
+                type="email"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                className="field-pill"
+                placeholder="Enter Email Address *"
+              />
+            </label>
+
+            <label className="relative flex overflow-hidden rounded-full border border-line bg-card transition focus-within:border-terracotta focus-within:ring-2 focus-within:ring-terracotta/20">
+              <span className="flex items-center gap-1.5 border-r border-line bg-ivory/80 px-3 text-sm font-semibold text-ink">
+                <span className="text-terracotta">
+                  <PhoneIcon />
+                </span>
+                +91
+              </span>
+              <input
+                required
+                type="tel"
+                inputMode="numeric"
+                pattern="[0-9]{10}"
+                maxLength={10}
+                value={form.mobile}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    mobile: e.target.value.replace(/\D/g, "").slice(0, 10),
+                  })
+                }
+                className="min-w-0 flex-1 bg-transparent px-3 py-3 text-sm text-ink outline-none"
+                placeholder="Mobile Number *"
+              />
+            </label>
+
+            <label className="relative block">
+              <span className="pointer-events-none absolute top-1/2 left-3.5 z-10 -translate-y-1/2 text-terracotta">
+                <EventIcon />
+              </span>
+              <select
+                required
+                value={form.event}
+                onChange={(e) =>
+                  setForm({ ...form, event: e.target.value as Occasion | "" })
+                }
+                className="field-pill appearance-none pr-10"
+              >
+                <option value="" disabled>
+                  Select Your Event *
+                </option>
+                {occasions.map((o) => (
+                  <option key={o} value={o}>
+                    {o}
+                  </option>
+                ))}
+              </select>
+              <span className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-muted">
+                ▾
+              </span>
+            </label>
+
+            <label className="relative block">
+              <span className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-terracotta">
+                <GuestsIcon />
+              </span>
+              <input
+                required
+                type="number"
+                min={1}
+                value={form.guests}
+                onChange={(e) => setForm({ ...form, guests: e.target.value })}
+                className="field-pill"
+                placeholder="Number of Guests *"
+              />
+            </label>
+
+            {error ? (
+              <p className="rounded-xl bg-terracotta/10 px-3 py-2 text-center text-sm font-semibold text-terracotta">
+                {error}
+              </p>
+            ) : null}
+          </div>
+
+          <div className="shrink-0 border-t border-line/70 bg-card/90 px-5 py-4 backdrop-blur-sm md:px-7">
+            <p className="mb-3 text-center text-[11px] leading-relaxed text-muted">
+              By submitting, you agree to our{" "}
+              <Link
+                href="/terms"
+                onClick={onClose}
+                className="font-semibold text-terracotta hover:underline"
+              >
+                Terms
+              </Link>{" "}
+              and{" "}
+              <Link
+                href="/privacy"
+                onClick={onClose}
+                className="font-semibold text-terracotta hover:underline"
+              >
+                Privacy Policy
+              </Link>
+              .
             </p>
             <button
-              type="button"
-              onClick={onClose}
-              className="mt-6 rounded-full bg-terracotta px-6 py-3 text-sm font-bold text-white shadow-md shadow-terracotta/25"
+              type="submit"
+              disabled={submit.isPending}
+              className="w-full rounded-full bg-terracotta py-3.5 text-sm font-bold text-white shadow-lg shadow-terracotta/30 transition hover:bg-terracotta-dark disabled:opacity-60"
             >
-              Close
+              {submit.isPending ? "Sending..." : "Get free quote"}
             </button>
           </div>
-        ) : (
-          <>
-            <div className="text-center">
-              <Image
-                src={site.brand.logo}
-                alt={site.brand.name}
-                width={80}
-                height={74}
-                className="mx-auto h-[72px] w-auto object-contain"
-                priority
-              />
-              <h2 className="mt-3 font-display text-[1.65rem] font-semibold leading-tight text-ink">
-                Let&apos;s plan your catering
-              </h2>
-              <p className="mt-1.5 text-sm text-muted">
-                Free enquiry with {site.brand.name}
-              </p>
-            </div>
-
-            <form onSubmit={onSubmit} className="mt-6 space-y-3">
-              <label className="relative block">
-                <span className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-terracotta">
-                  <UserIcon />
-                </span>
-                <input
-                  required
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className="field-pill"
-                  placeholder="Enter Your Name *"
-                />
-              </label>
-
-              <label className="relative block">
-                <span className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-terracotta">
-                  <MailIcon />
-                </span>
-                <input
-                  required
-                  type="email"
-                  value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  className="field-pill"
-                  placeholder="Enter Email Address *"
-                />
-              </label>
-
-              <label className="relative flex overflow-hidden rounded-full border border-line bg-card transition focus-within:border-terracotta focus-within:ring-2 focus-within:ring-terracotta/20">
-                <span className="flex items-center gap-1.5 border-r border-line bg-ivory/80 px-3 text-sm font-semibold text-ink">
-                  <span className="text-terracotta">
-                    <PhoneIcon />
-                  </span>
-                  +91
-                </span>
-                <input
-                  required
-                  type="tel"
-                  inputMode="numeric"
-                  pattern="[0-9]{10}"
-                  maxLength={10}
-                  value={form.mobile}
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      mobile: e.target.value.replace(/\D/g, "").slice(0, 10),
-                    })
-                  }
-                  className="min-w-0 flex-1 bg-transparent px-3 py-3 text-sm text-ink outline-none"
-                  placeholder="Mobile Number *"
-                />
-              </label>
-
-              <label className="relative block">
-                <span className="pointer-events-none absolute top-1/2 left-3.5 z-10 -translate-y-1/2 text-terracotta">
-                  <EventIcon />
-                </span>
-                <select
-                  required
-                  value={form.event}
-                  onChange={(e) =>
-                    setForm({ ...form, event: e.target.value as Occasion | "" })
-                  }
-                  className="field-pill appearance-none pr-10"
-                >
-                  <option value="" disabled>
-                    Select Your Event *
-                  </option>
-                  {occasions.map((o) => (
-                    <option key={o} value={o}>
-                      {o}
-                    </option>
-                  ))}
-                </select>
-                <span className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-muted">
-                  ▾
-                </span>
-              </label>
-
-              <label className="relative block">
-                <span className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-terracotta">
-                  <GuestsIcon />
-                </span>
-                <input
-                  required
-                  type="number"
-                  min={1}
-                  value={form.guests}
-                  onChange={(e) => setForm({ ...form, guests: e.target.value })}
-                  className="field-pill"
-                  placeholder="Kitne logo ka khana? *"
-                />
-              </label>
-
-              <p className="pt-1 text-center text-[11px] leading-relaxed text-muted">
-                By submitting, you agree to our{" "}
-                <Link
-                  href="/terms"
-                  onClick={onClose}
-                  className="font-semibold text-terracotta hover:underline"
-                >
-                  Terms
-                </Link>{" "}
-                and{" "}
-                <Link
-                  href="/privacy"
-                  onClick={onClose}
-                  className="font-semibold text-terracotta hover:underline"
-                >
-                  Privacy Policy
-                </Link>
-                .
-              </p>
-
-              <button
-                type="submit"
-                className="w-full rounded-full bg-terracotta py-3.5 text-sm font-bold text-white shadow-lg shadow-terracotta/30 transition hover:bg-terracotta-dark"
-              >
-                Get free quote
-              </button>
-            </form>
-          </>
-        )}
+        </form>
       </div>
     </div>
   );

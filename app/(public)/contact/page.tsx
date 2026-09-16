@@ -44,11 +44,11 @@ export default function ContactPage() {
           />
           <div className="absolute inset-0 bg-ink/65" />
         </div>
-        <div className="relative mx-auto max-w-7xl px-4 py-16 md:px-6 md:py-24">
+        <div className="relative mx-auto max-w-7xl px-3 py-12 sm:px-4 md:px-6 md:py-24">
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-terracotta-soft">
             Get in touch
           </p>
-          <h1 className="mt-3 font-display text-4xl font-semibold text-white md:text-5xl">
+          <h1 className="mt-3 font-display text-3xl font-semibold text-white sm:text-4xl md:text-5xl">
             Contact Us
           </h1>
           <p className="mt-3 max-w-xl text-sm text-white/90 md:text-base">
@@ -58,7 +58,7 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-8 px-4 py-12 md:grid-cols-[0.9fr_1.2fr] md:px-6 md:py-16">
+      <section className="mx-auto grid max-w-7xl gap-8 px-3 py-10 sm:px-4 md:grid-cols-[0.9fr_1.2fr] md:px-6 md:py-16">
         <aside className="space-y-4">
           <div className="rounded-2xl bg-card p-6 shadow-sm ring-1 ring-line">
             <div className="mb-4 flex items-center gap-3">

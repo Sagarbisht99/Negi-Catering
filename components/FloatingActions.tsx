@@ -4,25 +4,27 @@ import { useEnquiry } from "@/components/EnquiryProvider";
 import { phoneHref, site, whatsappHref } from "@/data/site";
 
 export default function FloatingActions() {
-  const { openEnquiry } = useEnquiry();
+  const { openEnquiry, submitted } = useEnquiry();
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => openEnquiry()}
-        aria-label="Get a quote"
-        className="fixed top-1/2 left-0 z-[90] flex -translate-y-1/2 flex-col items-center gap-2 rounded-r-lg bg-terracotta px-2.5 py-4 text-white shadow-lg shadow-terracotta/30 transition hover:bg-terracotta-dark"
-      >
-        <span className="flex h-6 w-6 items-center justify-center rounded-md bg-white/15">
-          <QuoteIcon />
-        </span>
-        <span className="font-headline [writing-mode:vertical-rl] rotate-180 text-[11px] font-extrabold tracking-[0.18em] uppercase">
-          Get a Quote
-        </span>
-      </button>
+      {submitted ? null : (
+        <button
+          type="button"
+          onClick={() => openEnquiry()}
+          aria-label="Get a quote"
+          className="fixed top-1/2 left-0 z-[90] hidden -translate-y-1/2 flex-col items-center gap-2 rounded-r-lg bg-terracotta px-2.5 py-4 text-white shadow-lg shadow-terracotta/30 transition hover:bg-terracotta-dark md:flex"
+        >
+          <span className="flex h-6 w-6 items-center justify-center rounded-md bg-white/15">
+            <QuoteIcon />
+          </span>
+          <span className="font-headline [writing-mode:vertical-rl] rotate-180 text-[11px] font-extrabold tracking-[0.18em] uppercase">
+            Get a Quote
+          </span>
+        </button>
+      )}
 
-      <div className="fixed right-4 bottom-14 z-[90] flex flex-col gap-3 md:right-6 md:bottom-16">
+      <div className="fixed right-3 bottom-16 z-[90] flex flex-col gap-3 md:right-6 md:bottom-16">
         <a
           href={whatsappHref()}
           target="_blank"

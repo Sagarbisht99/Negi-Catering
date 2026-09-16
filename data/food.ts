@@ -3,6 +3,7 @@ export type FoodItem = {
   name: string;
   image: string;
   category: string;
+  description?: string;
 };
 
 export const foodCategories = [
@@ -17,6 +18,10 @@ export const foodCategories = [
 ] as const;
 
 export type FoodCategory = (typeof foodCategories)[number];
+
+export const adminFoodCategories = foodCategories.filter(
+  (category): category is Exclude<FoodCategory, "All"> => category !== "All",
+);
 
 /** Placeholder menu — replace via admin panel later */
 export const foodItems: FoodItem[] = [

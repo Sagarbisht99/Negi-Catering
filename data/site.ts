@@ -26,7 +26,6 @@ export const site = {
   },
   location: {
     label: "Delhi NCR",
-    cities: ["Delhi", "Noida", "Gurgaon", "Faridabad"],
   },
   social: {
     instagram: "https://instagram.com/",
@@ -61,6 +60,6 @@ export function whatsappHref(
   return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
 }
 
-export function citiesLine(sep = " · ") {
-  return site.location.cities.join(sep);
+export function citiesLine() {
+  return site.location.label;
 }

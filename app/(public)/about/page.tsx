@@ -48,11 +48,11 @@ export default function AboutPage() {
           />
           <div className="absolute inset-0 bg-ink/65" />
         </div>
-        <div className="relative mx-auto max-w-7xl px-4 py-20 md:px-6 md:py-28">
+        <div className="relative mx-auto max-w-7xl px-3 py-14 sm:px-4 md:px-6 md:py-28">
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-terracotta-soft">
             {site.brand.sinceLabel}
           </p>
-          <h1 className="mt-3 max-w-2xl font-display text-4xl font-semibold text-white md:text-6xl">
+          <h1 className="mt-3 max-w-2xl font-display text-3xl font-semibold text-white sm:text-4xl md:text-6xl">
             About {site.brand.fullName}
           </h1>
           <p className="mt-4 max-w-xl text-sm leading-relaxed text-white/90 md:text-lg">
@@ -62,7 +62,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-10 px-4 py-14 md:grid-cols-2 md:items-center md:px-6 md:py-20">
+      <section className="mx-auto grid max-w-7xl gap-8 px-3 py-10 sm:px-4 md:grid-cols-2 md:items-center md:gap-10 md:px-6 md:py-20">
         <div className="relative aspect-[4/3] overflow-hidden rounded-[28px] shadow-sm ring-1 ring-line">
           <Image
             src="/images/chef.jpg"
@@ -73,7 +73,7 @@ export default function AboutPage() {
           />
         </div>
         <div>
-          <h2 className="font-display text-3xl font-semibold text-ink md:text-4xl">
+          <h2 className="font-display text-2xl font-semibold text-ink sm:text-3xl md:text-4xl">
             Our Story
           </h2>
           <p className="mt-4 text-sm leading-relaxed text-muted md:text-base">
@@ -96,9 +96,9 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="border-y border-line bg-ivory-deep/40 py-14 md:py-16">
-        <div className="mx-auto max-w-7xl px-4 md:px-6">
-          <h2 className="text-center font-display text-3xl font-semibold text-ink md:text-4xl">
+      <section className="border-y border-line bg-ivory-deep/40 py-10 md:py-16">
+        <div className="mx-auto max-w-7xl px-3 sm:px-4 md:px-6">
+          <h2 className="text-center font-display text-2xl font-semibold text-ink sm:text-3xl md:text-4xl">
             What We Stand For
           </h2>
           <div className="mt-8 grid gap-4 md:grid-cols-3">
@@ -115,8 +115,8 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-14 md:px-6 md:py-16">
-        <h2 className="font-display text-3xl font-semibold text-ink md:text-4xl">
+      <section className="mx-auto max-w-7xl px-3 py-10 sm:px-4 md:px-6 md:py-16">
+        <h2 className="font-display text-2xl font-semibold text-ink sm:text-3xl md:text-4xl">
           Our Journey
         </h2>
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -134,10 +134,10 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 pb-16 md:px-6">
-        <div className="overflow-hidden rounded-[28px] bg-terracotta px-6 py-10 text-white md:flex md:items-center md:justify-between md:px-10">
+      <section className="mx-auto max-w-7xl px-3 pb-12 sm:px-4 md:px-6 md:pb-16">
+        <div className="overflow-hidden rounded-[24px] bg-terracotta px-5 py-8 text-white sm:rounded-[28px] sm:px-6 md:flex md:items-center md:justify-between md:px-10 md:py-10">
           <div>
-            <h2 className="font-display text-3xl font-semibold md:text-4xl">
+            <h2 className="font-display text-2xl font-semibold sm:text-3xl md:text-4xl">
               Planning an event?
             </h2>
             <p className="mt-2 text-sm text-white/90">
@@ -146,7 +146,7 @@ export default function AboutPage() {
           </div>
           <Link
             href="/contact"
-            className="mt-6 inline-flex rounded-full bg-card px-6 py-3 text-sm font-bold text-terracotta transition hover:bg-ivory md:mt-0"
+            className="mt-6 inline-flex w-full justify-center rounded-full bg-card px-6 py-3 text-sm font-bold text-terracotta transition hover:bg-ivory md:mt-0 md:w-auto"
           >
             Get a Quote
           </Link>

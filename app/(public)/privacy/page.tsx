@@ -17,7 +17,7 @@ export default function PrivacyPage() {
         {
           title: "1. Information we collect",
           body: [
-            "When you submit an enquiry or contact form, we may collect your name, email, mobile number, event type, guest count, message details, and any preferences you share.",
+            "When you submit an enquiry or contact form, we may collect your name, email, mobile number, event type, guest count, and any preferences you share.",
             "We may also receive basic technical data such as browser type or device information when you browse the website.",
           ],
         },
