@@ -1,12 +1,16 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { occasions } from "@/data/occasions";
 import { sendEnquiryEmail, isMailConfigured } from "@/lib/mailer";
 import { Enquiry, enquiryStatuses, type EnquiryStatus } from "@/lib/models/Enquiry";
 import { dbConnect } from "@/lib/mongodb";
 import { serializeDoc } from "@/lib/serialize";
 import { requireAdmin } from "@/lib/session";
+import {
+  enquiryAdminSchema,
+  enquiryFormSchema,
+  parseWithZod,
+} from "@/lib/validation";
 
 export type { EnquiryStatus };
 
@@ -28,43 +32,13 @@ export type EnquiryInput = {
   email: string;
   mobile: string;
   event: string;
-  guests: string;
+  guests: string | number;
   source: "contact" | "popup";
 };
 
 function refreshEnquiries() {
   revalidatePath("/admin/enquiries");
   revalidatePath("/admin/dashboard");
-}
-
-function parseEnquiry(input: EnquiryInput) {
-  const name = String(input.name ?? "").trim();
-  const email = String(input.email ?? "").trim().toLowerCase();
-  const mobile = String(input.mobile ?? "").trim();
-  const event = String(input.event ?? "").trim();
-  const guests = Number(input.guests);
-  const source = input.source;
-
-  if (!name || !email || !mobile || !event) {
-    throw new Error("Please fill all required fields");
-  }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    throw new Error("Please enter a valid email");
-  }
-  if (!/^[0-9+\-\s]{10,15}$/.test(mobile)) {
-    throw new Error("Please enter a valid mobile number");
-  }
-  if (!(occasions as readonly string[]).includes(event)) {
-    throw new Error("Please select a valid event");
-  }
-  if (!Number.isFinite(guests) || guests < 1) {
-    throw new Error("Please enter number of guests");
-  }
-  if (source !== "contact" && source !== "popup") {
-    throw new Error("Invalid form source");
-  }
-
-  return { name, email, mobile, event, guests, source, status: "pending" as const };
 }
 
 function normalizeStatus(value: unknown): EnquiryStatus {
@@ -75,10 +49,10 @@ function normalizeStatus(value: unknown): EnquiryStatus {
 }
 
 export async function submitEnquiry(input: EnquiryInput) {
-  const data = parseEnquiry(input);
+  const data = parseWithZod(enquiryFormSchema, input);
 
   await dbConnect();
-  await Enquiry.create(data);
+  await Enquiry.create({ ...data, status: "pending" });
   refreshEnquiries();
 
   let emailSent = false;
@@ -126,44 +100,17 @@ export async function updateEnquiry(
     email: string;
     mobile: string;
     event: string;
-    guests: string;
+    guests: string | number;
     status: EnquiryStatus;
   },
 ) {
   await requireAdmin();
-
-  const name = String(input.name ?? "").trim();
-  const email = String(input.email ?? "").trim().toLowerCase();
-  const mobile = String(input.mobile ?? "").trim();
-  const event = String(input.event ?? "").trim();
-  const guests = Number(input.guests);
-  const status = normalizeStatus(input.status);
-
-  if (!name || !email || !mobile || !event) {
-    throw new Error("Please fill all required fields");
-  }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    throw new Error("Please enter a valid email");
-  }
-  if (!/^[0-9+\-\s]{10,15}$/.test(mobile)) {
-    throw new Error("Please enter a valid mobile number");
-  }
-  if (!(occasions as readonly string[]).includes(event)) {
-    throw new Error("Please select a valid event");
-  }
-  if (!Number.isFinite(guests) || guests < 1) {
-    throw new Error("Please enter number of guests");
-  }
+  const data = parseWithZod(enquiryAdminSchema, input);
 
   await dbConnect();
   await Enquiry.findByIdAndUpdate(id, {
-    name,
-    email,
-    mobile,
-    event,
-    guests,
-    status,
-    isRead: status !== "pending",
+    ...data,
+    isRead: data.status !== "pending",
   });
   refreshEnquiries();
 }

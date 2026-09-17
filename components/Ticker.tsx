@@ -11,8 +11,8 @@ export default function Ticker() {
   const loop = [...items, ...items];
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-[80] overflow-hidden border-t border-line bg-terracotta py-2 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] sm:py-2.5">
-      <div className="animate-ticker flex w-max gap-8 whitespace-nowrap px-4 text-xs font-semibold uppercase tracking-[0.12em] text-white">
+    <div className="fixed inset-x-0 bottom-0 z-[80] overflow-hidden border-t border-line bg-terracotta py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] shadow-[0_-4px_20px_rgba(0,0,0,0.08)] sm:py-2.5 sm:pb-[max(0.625rem,env(safe-area-inset-bottom))]">
+      <div className="animate-ticker flex w-max gap-8 whitespace-nowrap px-4 text-[10px] font-semibold uppercase tracking-[0.12em] text-white sm:text-xs">
         {loop.map((text, i) => (
           <span key={`${text}-${i}`} className="inline-flex items-center gap-8">
             <span className="inline-flex items-center gap-2">

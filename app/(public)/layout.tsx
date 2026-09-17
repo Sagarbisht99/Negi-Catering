@@ -11,7 +11,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
     <ToastProvider>
       <EnquiryProvider>
         <Header />
-        <main className="flex-1 pb-20 sm:pb-14">{children}</main>
+        <main className="flex-1">{children}</main>
         <Footer />
         <FloatingActions />
         <Ticker />

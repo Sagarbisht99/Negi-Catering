@@ -5,7 +5,7 @@
 export const site = {
   brand: {
     shortName: "Negi",
-    name: "Negi Caterers",
+    name: "Negi Caterers and Tiffin",
     fullName: "Negi Caterers and Tiffin",
     tagline: "Caterers & Tiffin",
     since: 1960,
@@ -16,21 +16,17 @@ export const site = {
   },
   contact: {
     /** Digits only with country code, no + (for WhatsApp wa.me) */
-    whatsapp: "919876543210",
+    whatsapp: "919315113011",
     /** E.164 style for tel: links */
-    phone: "+919876543210",
+    phone: "+919315113011",
     /** Display format */
-    phoneDisplay: "+91 98765 43210",
-    email: "hello@negicaterers.com",
+    phoneDisplay: "+91 93151 13011",
+    email: "Pratyaksh25negi@gmail.com",
     hours: "Mon–Sun · 9:00 AM – 9:00 PM",
   },
   location: {
     label: "Delhi NCR",
-  },
-  social: {
-    instagram: "https://instagram.com/",
-    facebook: "https://facebook.com/",
-    youtube: "https://youtube.com/",
+    address: "A-136, New Ashok Nagar, Gali No. 13, Delhi — 110096",
   },
   reviews: {
     rating: 4.8,
@@ -39,7 +35,7 @@ export const site = {
     googleUrl: "https://www.google.com/maps",
   },
   seo: {
-    title: "Negi Caterers and Tiffin | Since 1960",
+    title: "Negi Caterers and Tiffin Services | Since 1960",
     description:
       "Traditional catering and tiffin service for every occasion — house parties, weddings, offices, and festivals. Since 1960.",
   },
@@ -62,4 +58,12 @@ export function whatsappHref(
 
 export function citiesLine() {
   return site.location.label;
+}
+
+export function mapsHref(address = site.location.address) {
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+}
+
+export function mapsEmbedSrc(address = site.location.address) {
+  return `https://maps.google.com/maps?q=${encodeURIComponent(address)}&output=embed`;
 }

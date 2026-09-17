@@ -42,7 +42,7 @@ export default function HowItWorks() {
           </p>
         </div>
 
-        <div className="mt-10 grid grid-cols-1 gap-8 sm:mt-14 sm:grid-cols-2 sm:gap-10 lg:grid-cols-4 lg:gap-x-0">
+        <div className="mt-10 grid grid-cols-1 gap-8 sm:mt-14 lg:grid-cols-4 lg:gap-x-0">
           {steps.map((step, index) => (
             <div key={step.n} className="relative text-center">
               <div className="relative mx-auto h-[72px] w-full">
@@ -92,7 +92,7 @@ export default function HowItWorks() {
 
               {index < steps.length - 1 ? (
                 <div
-                  className="mt-4 flex justify-center text-terracotta sm:hidden"
+                  className="mt-4 flex justify-center text-terracotta lg:hidden"
                   aria-hidden
                 >
                   <svg width="28" height="40" viewBox="0 0 28 40" fill="none">

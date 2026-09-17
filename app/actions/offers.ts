@@ -6,6 +6,7 @@ import { OfferBanner } from "@/lib/models/OfferBanner";
 import { dbConnect } from "@/lib/mongodb";
 import { serializeDoc } from "@/lib/serialize";
 import { requireAdmin } from "@/lib/session";
+import { offerFieldsSchema, parseWithZod } from "@/lib/validation";
 
 export type OfferRecord = {
   id: string;
@@ -20,85 +21,102 @@ function refreshOffers() {
   revalidatePath("/admin/dashboard");
 }
 
-export async function listOffers(): Promise<OfferRecord[]> {
+/** Keep at most one banner document; delete older extras. */
+async function keepSingleOffer() {
+  const rows = await OfferBanner.find().sort({ createdAt: -1 }).lean();
+  if (rows.length <= 1) return rows[0] ?? null;
+
+  const [keep, ...extras] = rows;
+  for (const row of extras) {
+    await deleteOfferImage((row as { fileId?: string }).fileId);
+    await OfferBanner.findByIdAndDelete(row._id);
+  }
+  return keep;
+}
+
+export async function getOffer(): Promise<OfferRecord | null> {
   await requireAdmin();
   await dbConnect();
-  const rows = await OfferBanner.find().sort({ createdAt: -1 }).lean();
-  return rows.map((row) => serializeDoc<OfferRecord>(row));
+  const row = await keepSingleOffer();
+  return row ? serializeDoc<OfferRecord>(row) : null;
+}
+
+/** @deprecated Use getOffer — kept for dashboard until callers update */
+export async function listOffers(): Promise<OfferRecord[]> {
+  const offer = await getOffer();
+  return offer ? [offer] : [];
 }
 
 export async function getVisibleOffer(): Promise<OfferRecord | null> {
   try {
     if (!process.env.MONGODB_URI) return null;
     await dbConnect();
-    const row = await OfferBanner.findOne({ isVisible: true }).lean();
+    const row = await OfferBanner.findOne({ isVisible: true })
+      .sort({ createdAt: -1 })
+      .lean();
     return row ? serializeDoc<OfferRecord>(row) : null;
   } catch {
     return null;
   }
 }
 
-export async function createOffer(formData: FormData) {
+/** Create or replace the single offer banner. */
+export async function saveOffer(formData: FormData) {
   await requireAdmin();
+  await dbConnect();
+
+  const { isVisible } = parseWithZod(offerFieldsSchema, {
+    isVisible: formData.get("isVisible") === "on",
+  });
   const imageFile = formData.get("image") as File | null;
-  const { url, fileId } = await uploadOfferImage(imageFile);
+
+  const existing = await keepSingleOffer();
+  const existingDoc = existing
+    ? await OfferBanner.findById(existing._id)
+    : null;
+
+  const { url, fileId } = await uploadOfferImage(
+    imageFile,
+    existingDoc?.image ?? "",
+  );
   if (!url) throw new Error("Image is required");
 
-  const isVisible = formData.get("isVisible") === "on";
-
-  await dbConnect();
-  if (isVisible) {
-    await OfferBanner.updateMany({}, { isVisible: false });
+  if (existingDoc) {
+    if (fileId && existingDoc.fileId && fileId !== existingDoc.fileId) {
+      await deleteOfferImage(existingDoc.fileId);
+    }
+    existingDoc.set({
+      image: url,
+      fileId: fileId ?? existingDoc.fileId,
+      isVisible,
+    });
+    await existingDoc.save();
+  } else {
+    await OfferBanner.create({ image: url, fileId, isVisible });
   }
 
-  await OfferBanner.create({ image: url, fileId, isVisible });
   refreshOffers();
 }
 
-export async function updateOffer(id: string, formData: FormData) {
+export async function setOfferVisible(isVisible: boolean) {
   await requireAdmin();
   await dbConnect();
 
-  const existing = await OfferBanner.findById(id);
-  if (!existing) throw new Error("Offer not found");
+  const existing = await keepSingleOffer();
+  if (!existing) throw new Error("No offer banner yet");
 
-  const imageFile = formData.get("image") as File | null;
-  const { url, fileId } = await uploadOfferImage(imageFile, existing.image);
-  const isVisible = formData.get("isVisible") === "on";
-
-  if (fileId && existing.fileId && fileId !== existing.fileId) {
-    await deleteOfferImage(existing.fileId);
-  }
-
-  if (isVisible) {
-    await OfferBanner.updateMany({ _id: { $ne: id } }, { isVisible: false });
-  }
-
-  existing.set({ image: url, fileId: fileId ?? existing.fileId, isVisible });
-  await existing.save();
+  await OfferBanner.findByIdAndUpdate(existing._id, { isVisible });
   refreshOffers();
 }
 
-export async function toggleOffer(id: string, isVisible: boolean) {
+export async function clearOffer() {
   await requireAdmin();
   await dbConnect();
 
-  if (isVisible) {
-    await OfferBanner.updateMany({}, { isVisible: false });
+  const rows = await OfferBanner.find().lean();
+  for (const row of rows) {
+    await deleteOfferImage((row as { fileId?: string }).fileId);
+    await OfferBanner.findByIdAndDelete(row._id);
   }
-
-  await OfferBanner.findByIdAndUpdate(id, { isVisible });
-  refreshOffers();
-}
-
-export async function deleteOffer(id: string) {
-  await requireAdmin();
-  await dbConnect();
-
-  const existing = await OfferBanner.findById(id);
-  if (!existing) throw new Error("Offer not found");
-
-  await deleteOfferImage(existing.fileId);
-  await OfferBanner.findByIdAndDelete(id);
   refreshOffers();
 }

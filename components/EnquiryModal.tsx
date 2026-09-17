@@ -4,6 +4,7 @@ import { useEnquiry } from "@/components/EnquiryProvider";
 import { occasions, type Occasion } from "@/data/occasions";
 import { site } from "@/data/site";
 import { useSubmitEnquiry } from "@/lib/publicQueries";
+import { enquiryFormSchema, zodFieldErrors, type FieldErrors } from "@/lib/validation";
 import Image from "next/image";
 import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
@@ -27,11 +28,13 @@ export default function EnquiryModal({ open, initialEvent = "", onClose }: Props
   const submit = useSubmitEnquiry();
   const [form, setForm] = useState(empty);
   const [error, setError] = useState("");
+  const [fieldErr, setFieldErr] = useState<FieldErrors>({});
 
   useEffect(() => {
     if (!open) return;
     setForm({ ...empty, event: initialEvent });
     setError("");
+    setFieldErr({});
     document.body.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -45,22 +48,33 @@ export default function EnquiryModal({ open, initialEvent = "", onClose }: Props
 
   if (!open) return null;
 
+  const update = (patch: Partial<typeof empty>) => {
+    setForm((prev) => ({ ...prev, ...patch }));
+    setFieldErr({});
+    setError("");
+  };
+
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
     setError("");
-    submit.mutate(
-      {
-        ...form,
-        event: form.event,
-        source: "popup",
+    const parsed = enquiryFormSchema.safeParse({
+      ...form,
+      source: "popup",
+    });
+    if (!parsed.success) {
+      setFieldErr(zodFieldErrors(parsed.error));
+      return;
+    }
+
+    submit.mutate(parsed.data, {
+      onSuccess: () => {
+        setFieldErr({});
+        notifyEnquirySuccess();
       },
-      {
-        onSuccess: () => notifyEnquirySuccess(),
-        onError: (err) => {
-          setError(err instanceof Error ? err.message : "Something went wrong");
-        },
+      onError: (err) => {
+        setError(err instanceof Error ? err.message : "Something went wrong");
       },
-    );
+    });
   };
 
   return (
@@ -79,7 +93,7 @@ export default function EnquiryModal({ open, initialEvent = "", onClose }: Props
           type="button"
           aria-label="Close"
           onClick={onClose}
-          className="absolute top-4 right-4 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-ivory/95 text-lg text-muted shadow-sm ring-1 ring-line transition hover:bg-ivory-deep hover:text-ink"
+          className="absolute top-4 right-4 z-20 flex h-11 w-11 items-center justify-center rounded-full bg-ivory/95 text-lg text-muted shadow-sm ring-1 ring-line transition hover:bg-ivory-deep hover:text-ink"
         >
           ×
         </button>
@@ -101,19 +115,19 @@ export default function EnquiryModal({ open, initialEvent = "", onClose }: Props
           </p>
         </div>
 
-        <form onSubmit={onSubmit} className="flex min-h-0 flex-1 flex-col">
+        <form onSubmit={onSubmit} noValidate className="flex min-h-0 flex-1 flex-col">
           <div className="scrollbar-thin min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain px-5 py-4 md:px-7">
             <label className="relative block">
               <span className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-terracotta">
                 <UserIcon />
               </span>
               <input
-                required
                 value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                onChange={(e) => update({ name: e.target.value })}
                 className="field-pill"
                 placeholder="Enter Your Name *"
               />
+              {fieldErr.name ? <FieldHint>{fieldErr.name}</FieldHint> : null}
             </label>
 
             <label className="relative block">
@@ -121,49 +135,48 @@ export default function EnquiryModal({ open, initialEvent = "", onClose }: Props
                 <MailIcon />
               </span>
               <input
-                required
                 type="email"
                 value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                onChange={(e) => update({ email: e.target.value })}
                 className="field-pill"
                 placeholder="Enter Email Address *"
               />
+              {fieldErr.email ? <FieldHint>{fieldErr.email}</FieldHint> : null}
             </label>
 
-            <label className="relative flex overflow-hidden rounded-full border border-line bg-card transition focus-within:border-terracotta focus-within:ring-2 focus-within:ring-terracotta/20">
-              <span className="flex items-center gap-1.5 border-r border-line bg-ivory/80 px-3 text-sm font-semibold text-ink">
-                <span className="text-terracotta">
-                  <PhoneIcon />
+            <div>
+              <label className="relative flex overflow-hidden rounded-full border border-line bg-card transition focus-within:border-terracotta focus-within:ring-2 focus-within:ring-terracotta/20">
+                <span className="flex items-center gap-1.5 border-r border-line bg-ivory/80 px-3 text-sm font-semibold text-ink">
+                  <span className="text-terracotta">
+                    <PhoneIcon />
+                  </span>
+                  +91
                 </span>
-                +91
-              </span>
-              <input
-                required
-                type="tel"
-                inputMode="numeric"
-                pattern="[0-9]{10}"
-                maxLength={10}
-                value={form.mobile}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    mobile: e.target.value.replace(/\D/g, "").slice(0, 10),
-                  })
-                }
-                className="min-w-0 flex-1 bg-transparent px-3 py-3 text-sm text-ink outline-none"
-                placeholder="Mobile Number *"
-              />
-            </label>
+                <input
+                  type="tel"
+                  inputMode="numeric"
+                  maxLength={10}
+                  value={form.mobile}
+                  onChange={(e) =>
+                    update({
+                      mobile: e.target.value.replace(/\D/g, "").slice(0, 10),
+                    })
+                  }
+                  className="min-w-0 flex-1 bg-transparent px-3 py-3 text-sm text-ink outline-none"
+                  placeholder="Mobile Number *"
+                />
+              </label>
+              {fieldErr.mobile ? <FieldHint>{fieldErr.mobile}</FieldHint> : null}
+            </div>
 
             <label className="relative block">
               <span className="pointer-events-none absolute top-1/2 left-3.5 z-10 -translate-y-1/2 text-terracotta">
                 <EventIcon />
               </span>
               <select
-                required
                 value={form.event}
                 onChange={(e) =>
-                  setForm({ ...form, event: e.target.value as Occasion | "" })
+                  update({ event: e.target.value as Occasion | "" })
                 }
                 className="field-pill appearance-none pr-10"
               >
@@ -179,6 +192,7 @@ export default function EnquiryModal({ open, initialEvent = "", onClose }: Props
               <span className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-muted">
                 ▾
               </span>
+              {fieldErr.event ? <FieldHint>{fieldErr.event}</FieldHint> : null}
             </label>
 
             <label className="relative block">
@@ -186,14 +200,14 @@ export default function EnquiryModal({ open, initialEvent = "", onClose }: Props
                 <GuestsIcon />
               </span>
               <input
-                required
                 type="number"
                 min={1}
                 value={form.guests}
-                onChange={(e) => setForm({ ...form, guests: e.target.value })}
+                onChange={(e) => update({ guests: e.target.value })}
                 className="field-pill"
                 placeholder="Number of Guests *"
               />
+              {fieldErr.guests ? <FieldHint>{fieldErr.guests}</FieldHint> : null}
             </label>
 
             {error ? (
@@ -235,6 +249,10 @@ export default function EnquiryModal({ open, initialEvent = "", onClose }: Props
       </div>
     </div>
   );
+}
+
+function FieldHint({ children }: { children: string }) {
+  return <p className="mt-1.5 px-1 text-xs font-semibold text-terracotta">{children}</p>;
 }
 
 function UserIcon() {

@@ -17,10 +17,12 @@ import {
   adminPanel,
   adminTableHead,
   adminTableRow,
+  adminTableScroll,
 } from "@/components/admin/adminStyles";
 import { usePagination } from "@/components/admin/usePagination";
 import { useToast } from "@/components/Toast";
 import { occasions } from "@/data/occasions";
+import { enquiryAdminSchema, zodFirstMessage } from "@/lib/validation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FormEvent, useMemo, useState } from "react";
 
@@ -85,14 +87,18 @@ export default function EnquiryManager() {
   const saveEdit = useMutation({
     mutationFn: async (formData: FormData) => {
       if (!editing) return;
-      await updateEnquiry(editing.id, {
+      const parsed = enquiryAdminSchema.safeParse({
         name: String(formData.get("name") ?? ""),
         email: String(formData.get("email") ?? ""),
         mobile: String(formData.get("mobile") ?? ""),
         event: String(formData.get("event") ?? ""),
         guests: String(formData.get("guests") ?? ""),
-        status: String(formData.get("status") ?? "pending") as EnquiryStatus,
+        status: String(formData.get("status") ?? "pending"),
       });
+      if (!parsed.success) {
+        throw new Error(zodFirstMessage(parsed.error));
+      }
+      await updateEnquiry(editing.id, parsed.data);
     },
     onSuccess: async () => {
       await invalidate();
@@ -181,7 +187,7 @@ export default function EnquiryManager() {
 
         {rows.length ? (
           <>
-            <div className="overflow-x-auto">
+            <div className={adminTableScroll}>
               <table className="min-w-full text-left text-sm">
                 <thead className={adminTableHead}>
                   <tr>
@@ -390,6 +396,7 @@ export default function EnquiryManager() {
         >
           <form
             onSubmit={onEditSubmit}
+            noValidate
             className="scrollbar-admin max-h-[90vh] w-full max-w-lg space-y-3 overflow-y-auto rounded-2xl bg-[#141414] p-6 ring-1 ring-white/10"
             onClick={(e) => e.stopPropagation()}
           >

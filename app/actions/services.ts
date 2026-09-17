@@ -6,6 +6,7 @@ import { Service } from "@/lib/models/Service";
 import { dbConnect } from "@/lib/mongodb";
 import { serializeDoc } from "@/lib/serialize";
 import { requireAdmin } from "@/lib/session";
+import { parseWithZod, serviceFieldsSchema } from "@/lib/validation";
 
 export type ServiceRecord = {
   id: string;
@@ -21,17 +22,17 @@ function isActiveValue(value: unknown) {
 }
 
 function readFields(formData: FormData) {
-  const name = String(formData.get("name") ?? "").trim();
-  const description = String(formData.get("description") ?? "").trim();
-  const isActive = formData.get("isActive") === "on";
-  if (!name || !description) {
-    throw new Error("Name and description are required");
-  }
-  return { name, description, isActive };
+  return parseWithZod(serviceFieldsSchema, {
+    name: String(formData.get("name") ?? ""),
+    description: String(formData.get("description") ?? ""),
+    isActive: formData.get("isActive") === "on",
+  });
 }
 
 function refreshServicePages() {
   revalidatePath("/", "layout");
+  revalidatePath("/services");
+  revalidatePath("/sitemap");
   revalidatePath("/admin/services");
   revalidatePath("/admin/dashboard");
 }

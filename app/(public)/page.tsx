@@ -5,6 +5,7 @@ import HowItWorks from "@/components/HowItWorks";
 import Occasions from "@/components/Occasions";
 import StatsBanner from "@/components/StatsBanner";
 import Testimonials from "@/components/Testimonials";
+import WhyChooseUs from "@/components/WhyChooseUs";
 
 export default function Home() {
   return (
@@ -13,6 +14,7 @@ export default function Home() {
       <FoodGallery preview />
       <Occasions />
       <StatsBanner />
+      <WhyChooseUs />
       <HowItWorks />
       <Testimonials />
       <Faq />

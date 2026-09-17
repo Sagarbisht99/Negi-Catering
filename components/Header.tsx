@@ -3,7 +3,7 @@
 import { useEnquiry } from "@/components/EnquiryProvider";
 import EnquiryHangTag from "@/components/EnquiryHangTag";
 import { occasions, type Occasion } from "@/data/occasions";
-import { site } from "@/data/site";
+import { mapsHref, site } from "@/data/site";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -21,6 +21,7 @@ export default function Header() {
   const { openEnquiry, submitted } = useEnquiry();
   const [open, setOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
+  const [mobileOccasionsOpen, setMobileOccasionsOpen] = useState(false);
   const [hash, setHash] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -30,6 +31,24 @@ export default function Header() {
     window.addEventListener("hashchange", sync);
     return () => window.removeEventListener("hashchange", sync);
   }, [pathname]);
+
+  useEffect(() => {
+    setOpen(false);
+    setServicesOpen(false);
+    setMobileOccasionsOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!open) {
+      setMobileOccasionsOpen(false);
+      return;
+    }
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
 
   const isActive = (href: string) => {
     if (href.startsWith("/#")) {
@@ -49,6 +68,14 @@ export default function Header() {
         : "text-terracotta hover:bg-terracotta/10 hover:text-terracotta-dark",
     ].join(" ");
 
+  const mobileLinkClass = (active: boolean) =>
+    [
+      "inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-semibold transition",
+      active
+        ? "bg-terracotta text-white"
+        : "text-terracotta hover:bg-terracotta/10",
+    ].join(" ");
+
   const pickOccasion = (occasion: Occasion) => {
     setServicesOpen(false);
     setOpen(false);
@@ -56,9 +83,9 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 overflow-visible border-b border-line/60 bg-ivory/70 backdrop-blur-md">
+    <header className="relative sticky top-0 z-50 overflow-visible border-b border-line/60 bg-ivory/70 backdrop-blur-md">
       <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2.5 md:gap-5 md:px-6">
-        <Link href="/" className="flex shrink-0 items-center gap-2">
+        <Link href="/" className="flex shrink-0 items-center gap-1">
           <Image
             src={site.brand.logo}
             alt={site.brand.fullName}
@@ -67,8 +94,8 @@ export default function Header() {
             className="h-12 w-auto object-contain md:h-14"
             priority
           />
-          <span className="flex min-w-0 flex-col leading-none">
-            <span className="font-display text-lg font-semibold tracking-tight text-ink sm:text-xl md:text-2xl">
+          <span className="-ml-0.5 flex min-w-0 flex-col leading-none">
+            <span className="font-display text-base font-semibold tracking-tight text-ink sm:text-xl md:text-2xl">
               {site.brand.shortName}
             </span>
             <span className="text-[9px] font-semibold uppercase tracking-[0.12em] text-terracotta sm:text-[10px] sm:tracking-[0.14em]">
@@ -77,7 +104,14 @@ export default function Header() {
           </span>
         </Link>
 
-        <div className="hidden items-center gap-2 rounded-full bg-card/80 px-3 py-1.5 ring-1 ring-line md:flex">
+        <a
+          href={mapsHref()}
+          target="_blank"
+          rel="noopener noreferrer"
+          title={site.location.address}
+          aria-label={`Open ${site.location.label} location on Google Maps`}
+          className="hidden items-center gap-2 rounded-full bg-card/80 px-3 py-1.5 ring-1 ring-line transition hover:ring-terracotta/40 md:flex"
+        >
           <span className="flex h-6 w-6 items-center justify-center rounded-full bg-terracotta/10 text-terracotta">
             <LocationDot />
           </span>
@@ -85,7 +119,7 @@ export default function Header() {
             <span className="text-muted">Available in </span>
             <span className="font-semibold text-terracotta">{site.location.label}</span>
           </p>
-        </div>
+        </a>
 
         <nav className="ml-auto hidden items-center gap-1.5 lg:flex">
           <Link
@@ -156,7 +190,7 @@ export default function Header() {
               <button
                 type="button"
                 onClick={() => openEnquiry()}
-                className="font-headline inline-flex items-center rounded-full bg-terracotta px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.06em] text-white shadow-sm shadow-terracotta/25 transition hover:bg-terracotta-dark sm:px-4 sm:py-2 sm:text-[11px] md:text-xs"
+                className="font-headline inline-flex min-h-11 items-center rounded-full bg-terracotta px-3.5 py-2 text-[10px] font-extrabold uppercase tracking-[0.06em] text-white shadow-sm shadow-terracotta/25 transition hover:bg-terracotta-dark sm:px-4 sm:text-[11px] md:text-xs"
               >
                 Get a Quote
               </button>
@@ -167,8 +201,9 @@ export default function Header() {
           ) : null}
           <button
             type="button"
-            className="rounded-lg p-2 text-ink lg:hidden"
-            aria-label="Open menu"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-lg text-ink lg:hidden"
+            aria-label={open ? "Close menu" : "Open menu"}
+            aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
           >
             <MenuIcon open={open} />
@@ -177,63 +212,84 @@ export default function Header() {
       </div>
 
       {open ? (
-        <div className="scrollbar-thin max-h-[min(80dvh,560px)] overflow-y-auto border-t border-line bg-card px-4 py-3 lg:hidden">
-          <nav className="flex flex-col gap-1.5">
-            <p className="px-3.5 pb-1 text-xs text-muted">
-              Available in <span className="font-semibold text-terracotta">{site.location.label}</span>
-            </p>
-            <p className="px-3.5 pt-1 text-[11px] font-bold uppercase tracking-wide text-muted">
-              Occasions
-            </p>
-            {occasions.map((item) => (
-              <button
-                key={item}
-                type="button"
-                className="rounded-full px-3.5 py-2 text-left text-sm font-semibold text-terracotta hover:bg-terracotta/10"
-                onClick={() => pickOccasion(item)}
+        <>
+          <button
+            type="button"
+            aria-label="Close menu overlay"
+            className="fixed inset-0 top-[var(--header-h,4.5rem)] z-40 bg-ink/35 lg:hidden"
+            onClick={() => setOpen(false)}
+          />
+          <div className="absolute inset-x-0 top-full z-50 border-b border-line bg-card shadow-lg lg:hidden">
+            <nav className="scrollbar-thin flex max-h-[min(60dvh,420px)] flex-col gap-0.5 overflow-y-auto px-3 pt-1 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+              <a
+                href={mapsHref()}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={site.location.address}
+                className="rounded-lg px-3 py-1.5 text-xs text-muted"
               >
-                {item}
-              </button>
-            ))}
-            <div className="my-1 border-t border-line" />
-            <Link
-              href="/services"
-              className={linkClass(servicesActive)}
-              aria-current={servicesActive ? "page" : undefined}
-              onClick={() => setOpen(false)}
-            >
-              Services
-            </Link>
-            {nav.map((item) => (
+                Available in{" "}
+                <span className="font-semibold text-terracotta">{site.location.label}</span>
+              </a>
+
               <Link
-                key={item.label}
-                href={item.href}
-                className={linkClass(isActive(item.href))}
-                aria-current={isActive(item.href) ? "page" : undefined}
-                onClick={() => {
-                  if (item.href.includes("#")) {
-                    setHash(item.href.replace("/", ""));
-                  }
-                  setOpen(false);
-                }}
+                href="/services"
+                className={mobileLinkClass(servicesActive)}
+                aria-current={servicesActive ? "page" : undefined}
+                onClick={() => setOpen(false)}
               >
-                {item.label}
+                Services
               </Link>
-            ))}
-            {submitted ? null : (
-              <button
-                type="button"
-                onClick={() => {
-                  setOpen(false);
-                  openEnquiry();
-                }}
-                className="mt-2 rounded-full bg-terracotta px-3.5 py-2.5 text-sm font-bold text-white"
-              >
-                Get a Quote
-              </button>
-            )}
-          </nav>
-        </div>
+
+              <div>
+                <button
+                  type="button"
+                  className={`${mobileLinkClass(false)} w-full justify-between`}
+                  aria-expanded={mobileOccasionsOpen}
+                  onClick={() => setMobileOccasionsOpen((v) => !v)}
+                >
+                  Occasions
+                  <span
+                    className={`transition-transform ${mobileOccasionsOpen ? "rotate-180" : ""}`}
+                  >
+                    <Chevron />
+                  </span>
+                </button>
+                {mobileOccasionsOpen ? (
+                  <div className="mb-1 ml-2 space-y-0.5 border-l border-line pl-2">
+                    {occasions.map((item) => (
+                      <button
+                        key={item}
+                        type="button"
+                        className="block w-full rounded-lg px-3 py-1.5 text-left text-sm font-semibold text-ink hover:bg-terracotta/10 hover:text-terracotta"
+                        onClick={() => pickOccasion(item)}
+                      >
+                        {item}
+                      </button>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+
+              {nav.map((item) => (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  className={mobileLinkClass(isActive(item.href))}
+                  aria-current={isActive(item.href) ? "page" : undefined}
+                  onClick={() => {
+                    if (item.href.includes("#")) {
+                      setHash(item.href.replace("/", ""));
+                    }
+                    setOpen(false);
+                  }}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+          </div>
+        </>
       ) : null}
     </header>
   );

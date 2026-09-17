@@ -53,7 +53,7 @@ export default function DashboardStats() {
       <div>
         <h1 className="text-2xl font-semibold text-white">Dashboard</h1>
         <p className="mt-1 text-sm text-zinc-500">
-          Overview of enquiries, food, services, and offer banners.
+          Overview of enquiries, food, services, and the offer banner.
         </p>
       </div>
 
@@ -68,10 +68,20 @@ export default function DashboardStats() {
               {card.title}
             </p>
             <p className="mt-2 text-3xl font-bold text-white">
-              {card.query.isPending ? "—" : (card.query.data?.length ?? 0)}
+              {card.query.isPending
+                ? "—"
+                : card.title === "Offer banner"
+                  ? (card.query.data?.length ?? 0) > 0
+                    ? "On"
+                    : "Off"
+                  : (card.query.data?.length ?? 0)}
             </p>
             <p className="mt-1 text-sm text-zinc-500">
-              {card.query.isError ? "Could not load" : "Total items"}
+              {card.query.isError
+                ? "Could not load"
+                : card.title === "Offer banner"
+                  ? "Popup banner"
+                  : "Total items"}
             </p>
           </Link>
         ))}

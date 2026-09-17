@@ -1,12 +1,12 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { adminFoodCategories } from "@/data/food";
 import { deleteImage, uploadImage } from "@/lib/imagekit";
 import { Food } from "@/lib/models/Food";
 import { dbConnect } from "@/lib/mongodb";
 import { serializeDoc } from "@/lib/serialize";
 import { requireAdmin } from "@/lib/session";
+import { foodFieldsSchema, parseWithZod } from "@/lib/validation";
 
 export type FoodRecord = {
   id: string;
@@ -23,24 +23,18 @@ function isActiveValue(value: unknown) {
 }
 
 function readFields(formData: FormData) {
-  const name = String(formData.get("name") ?? "").trim();
-  const category = String(formData.get("category") ?? "").trim();
-  const description = String(formData.get("description") ?? "").trim();
-  const isActive = formData.get("isActive") === "on";
-
-  if (!name || !description) {
-    throw new Error("Name and description are required");
-  }
-  if (!(adminFoodCategories as readonly string[]).includes(category)) {
-    throw new Error("Choose a valid category");
-  }
-
-  return { name, category, description, isActive };
+  return parseWithZod(foodFieldsSchema, {
+    name: String(formData.get("name") ?? ""),
+    category: String(formData.get("category") ?? ""),
+    description: String(formData.get("description") ?? ""),
+    isActive: formData.get("isActive") === "on",
+  });
 }
 
 function refreshFoodPages() {
   revalidatePath("/", "layout");
   revalidatePath("/gallery");
+  revalidatePath("/sitemap");
   revalidatePath("/admin/food");
   revalidatePath("/admin/dashboard");
 }

@@ -27,6 +27,7 @@ import {
   adminPanel,
   adminTableHead,
   adminTableRow,
+  adminTableScroll,
 } from "@/components/admin/adminStyles";
 import { usePagination } from "@/components/admin/usePagination";
 import { useToast } from "@/components/Toast";
@@ -163,7 +164,7 @@ export default function ServiceManager() {
 
         {rows.length ? (
           <>
-            <div className="overflow-x-auto">
+            <div className={adminTableScroll}>
               <table className="min-w-full text-left text-sm">
                 <thead className={adminTableHead}>
                   <tr>

@@ -1,4 +1,4 @@
-import { citiesLine, emailHref, phoneHref, site, whatsappHref } from "@/data/site";
+import { citiesLine, emailHref, phoneHref, site } from "@/data/site";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -19,11 +19,11 @@ export default function Footer() {
   const legal = [
     { label: "Terms & Conditions", href: "/terms" },
     { label: "Privacy Policy", href: "/privacy" },
-    { label: "Disclaimer", href: "/disclaimer" },
+    { label: "Sitemap", href: "/sitemap" },
   ];
 
   return (
-    <footer className="mt-auto pb-10">
+    <footer className="mt-auto pb-[calc(2.5rem+env(safe-area-inset-bottom))]">
       <div className="relative overflow-hidden border-t border-line bg-gradient-to-b from-card to-ivory-deep/60">
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.06]"
@@ -35,65 +35,23 @@ export default function Footer() {
         />
 
         <div className="relative mx-auto max-w-7xl px-3 pt-10 sm:px-4 md:px-6 md:pt-14">
-          <div className="mb-10 overflow-hidden rounded-[24px] bg-terracotta px-5 py-6 text-white shadow-lg shadow-terracotta/20 sm:px-6 sm:py-7 md:flex md:items-center md:justify-between md:px-8">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/80">
-                {site.brand.sinceLabel}
-              </p>
-              <h2 className="mt-1 font-display text-2xl font-semibold md:text-3xl">
-                Ready to plan your menu?
-              </h2>
-              <p className="mt-1 text-sm text-white/90">
-                Tell us the occasion and guest count — we&apos;ll take it from there.
-              </p>
-            </div>
-            <div className="mt-5 flex flex-wrap gap-3 md:mt-0">
-              <Link
-                href="/contact"
-                className="rounded-full bg-card px-5 py-2.5 text-sm font-bold text-terracotta transition hover:bg-ivory"
-              >
-                Contact Us
-              </Link>
-              <a
-                href={whatsappHref()}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-full border border-white/40 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-white/10"
-              >
-                WhatsApp
-              </a>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-8 pb-10 lg:grid-cols-12 lg:gap-10 lg:pb-12">
+          <div className="grid grid-cols-2 gap-x-6 gap-y-8 pb-10 lg:grid-cols-12 lg:gap-10 lg:pb-12">
             <div className="col-span-2 lg:col-span-4">
-              <Link href="/" className="inline-flex items-center gap-3">
+              <Link href="/" className="inline-flex max-w-full items-center gap-3">
                 <Image
                   src={site.brand.logo}
                   alt={site.brand.fullName}
                   width={64}
                   height={58}
-                  className="h-14 w-auto object-contain"
+                  className="h-12 w-auto shrink-0 object-contain sm:h-14"
                 />
-                <span className="font-display text-2xl font-semibold text-terracotta">
+                <span className="font-display text-xl font-semibold text-terracotta sm:text-2xl">
                   {site.brand.name}
                 </span>
               </Link>
               <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted">
                 {site.brand.description}
               </p>
-              <div className="mt-5">
-                <a
-                  href={site.social.instagram}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Instagram"
-                  title="Instagram"
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-terracotta/10 text-terracotta ring-1 ring-terracotta/20 transition hover:bg-terracotta hover:text-white"
-                >
-                  <InstagramIcon />
-                </a>
-              </div>
             </div>
 
             <div className="lg:col-span-2">
@@ -152,11 +110,11 @@ export default function Footer() {
                   </a>
                 </li>
                 <li>
-                  <a href={emailHref()} className="hover:text-terracotta">
+                  <a href={emailHref()} className="break-all hover:text-terracotta">
                     {site.contact.email}
                   </a>
                 </li>
-                <li>{site.location.label}</li>
+                <li className="max-w-md leading-relaxed">{site.location.address}</li>
                 <li className="text-xs">{site.contact.hours}</li>
               </ul>
             </div>
@@ -187,23 +145,5 @@ export default function Footer() {
         </div>
       </div>
     </footer>
-  );
-}
-
-function InstagramIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
-      <rect
-        x="3.5"
-        y="3.5"
-        width="17"
-        height="17"
-        rx="5"
-        stroke="currentColor"
-        strokeWidth="1.8"
-      />
-      <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="1.8" />
-      <circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" />
-    </svg>
   );
 }

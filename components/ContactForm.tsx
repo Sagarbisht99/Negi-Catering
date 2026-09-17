@@ -3,6 +3,7 @@
 import { occasions, type Occasion } from "@/data/occasions";
 import { useSubmitEnquiry } from "@/lib/publicQueries";
 import { useEnquiry } from "@/components/EnquiryProvider";
+import { enquiryFormSchema, zodFieldErrors, type FieldErrors } from "@/lib/validation";
 import { FormEvent, useState } from "react";
 
 const fieldClass =
@@ -20,24 +21,36 @@ export default function ContactForm() {
   const { submitted, notifyEnquirySuccess } = useEnquiry();
   const submit = useSubmitEnquiry();
   const [error, setError] = useState("");
+  const [fieldErr, setFieldErr] = useState<FieldErrors>({});
   const [form, setForm] = useState(empty);
+
+  const update = (patch: Partial<typeof empty>) => {
+    setForm((prev) => ({ ...prev, ...patch }));
+    setFieldErr({});
+    setError("");
+  };
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
     setError("");
-    submit.mutate(
-      {
-        ...form,
-        event: form.event,
-        source: "contact",
+    const parsed = enquiryFormSchema.safeParse({
+      ...form,
+      source: "contact",
+    });
+    if (!parsed.success) {
+      setFieldErr(zodFieldErrors(parsed.error));
+      return;
+    }
+
+    submit.mutate(parsed.data, {
+      onSuccess: () => {
+        setFieldErr({});
+        notifyEnquirySuccess();
       },
-      {
-        onSuccess: () => notifyEnquirySuccess(),
-        onError: (err) => {
-          setError(err instanceof Error ? err.message : "Something went wrong");
-        },
+      onError: (err) => {
+        setError(err instanceof Error ? err.message : "Something went wrong");
       },
-    );
+    });
   };
 
   if (submitted) return null;
@@ -45,6 +58,7 @@ export default function ContactForm() {
   return (
     <form
       onSubmit={onSubmit}
+      noValidate
       className="space-y-4 rounded-2xl bg-card p-5 shadow-sm ring-1 ring-line md:p-7"
     >
       <div className="grid gap-4 md:grid-cols-2">
@@ -53,50 +67,52 @@ export default function ContactForm() {
             Name
           </span>
           <input
-            required
             className={fieldClass}
             value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            onChange={(e) => update({ name: e.target.value })}
             placeholder="Your full name"
           />
+          {fieldErr.name ? <FieldHint>{fieldErr.name}</FieldHint> : null}
         </label>
         <label className="block">
           <span className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-muted">
             Email
           </span>
           <input
-            required
             type="email"
             className={fieldClass}
             value={form.email}
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
+            onChange={(e) => update({ email: e.target.value })}
             placeholder="you@email.com"
           />
+          {fieldErr.email ? <FieldHint>{fieldErr.email}</FieldHint> : null}
         </label>
         <label className="block">
           <span className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-muted">
             Mobile Number
           </span>
           <input
-            required
             type="tel"
-            pattern="[0-9+\-\s]{10,15}"
+            inputMode="numeric"
+            maxLength={10}
             className={fieldClass}
             value={form.mobile}
-            onChange={(e) => setForm({ ...form, mobile: e.target.value })}
+            onChange={(e) =>
+              update({ mobile: e.target.value.replace(/\D/g, "").slice(0, 10) })
+            }
             placeholder="10-digit mobile number"
           />
+          {fieldErr.mobile ? <FieldHint>{fieldErr.mobile}</FieldHint> : null}
         </label>
         <label className="block">
           <span className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-muted">
             Event
           </span>
           <select
-            required
             className={fieldClass}
             value={form.event}
             onChange={(e) =>
-              setForm({ ...form, event: e.target.value as Occasion | "" })
+              update({ event: e.target.value as Occasion | "" })
             }
           >
             <option value="" disabled>
@@ -108,20 +124,21 @@ export default function ContactForm() {
               </option>
             ))}
           </select>
+          {fieldErr.event ? <FieldHint>{fieldErr.event}</FieldHint> : null}
         </label>
         <label className="block md:col-span-2">
           <span className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-muted">
             Number of Guests
           </span>
           <input
-            required
             type="number"
             min={1}
             className={fieldClass}
             value={form.guests}
-            onChange={(e) => setForm({ ...form, guests: e.target.value })}
+            onChange={(e) => update({ guests: e.target.value })}
             placeholder="How many people?"
           />
+          {fieldErr.guests ? <FieldHint>{fieldErr.guests}</FieldHint> : null}
         </label>
       </div>
       {error ? (
@@ -138,4 +155,8 @@ export default function ContactForm() {
       </button>
     </form>
   );
+}
+
+function FieldHint({ children }: { children: string }) {
+  return <p className="mt-1.5 text-xs font-semibold text-terracotta">{children}</p>;
 }

@@ -3,6 +3,7 @@
 import { createHash, timingSafeEqual } from "crypto";
 import { redirect } from "next/navigation";
 import { createSession, deleteSession, getSession } from "@/lib/session";
+import { adminLoginSchema } from "@/lib/validation";
 
 function digest(value: string) {
   return createHash("sha256").update(value).digest();
@@ -13,8 +14,17 @@ function matches(input: string, expected: string) {
 }
 
 export async function loginAction(_prev: { error?: string } | undefined, formData: FormData) {
-  const username = String(formData.get("username") ?? "");
-  const password = String(formData.get("password") ?? "");
+  const parsed = adminLoginSchema.safeParse({
+    username: String(formData.get("username") ?? ""),
+    password: String(formData.get("password") ?? ""),
+  });
+  if (!parsed.success) {
+    return { error: parsed.error.flatten().fieldErrors.username?.[0]
+      ?? parsed.error.flatten().fieldErrors.password?.[0]
+      ?? "Please enter username and password." };
+  }
+
+  const { username, password } = parsed.data;
   const expectedUser = process.env.ADMIN_USERNAME ?? "";
   const expectedPass = process.env.ADMIN_PASSWORD ?? "";
 

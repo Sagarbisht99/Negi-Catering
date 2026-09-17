@@ -1,40 +1,50 @@
+"use client";
+
 import { site } from "@/data/site";
+import Image from "next/image";
+import { useState } from "react";
 
 const reviews = [
   {
     name: "Ananya Sharma",
     role: "Housewarming · Delhi NCR",
     rating: 5,
-    text: "Negi Caterers made our housewarming effortless. The food tasted like home, and guests kept asking for the caterer's number.",
+    image: "https://i.pinimg.com/736x/13/11/86/13118668ae1ef358f5935670e3235bc2.jpg",
+    text: "Negi Caterers and Tiffin made our housewarming effortless. The food tasted like home, and guests kept asking for the caterer's number.",
   },
   {
     name: "Rohit Mehra",
     role: "Daily Tiffin · Delhi NCR",
     rating: 5,
+    image: "https://i.pinimg.com/736x/ff/53/58/ff5358c324f5dd2d68ccfdb1414e259b.jpg",
     text: "We've used their tiffin for years. Consistent quality, on-time delivery, and thoughtful packaging every single day.",
   },
   {
     name: "Priya Nair",
     role: "Office Party · Delhi NCR",
     rating: 5,
+    image: "https://i.pinimg.com/736x/82/21/b5/8221b53df22f2f65534e5f4d1a1d11c2.jpg",
     text: "Our office Diwali lunch was a hit — beautiful presentation, generous portions, and the live counter was a crowd favourite.",
   },
   {
     name: "Vikram Singh",
     role: "Anniversary · Delhi NCR",
     rating: 5,
+    image: "https://i.pinimg.com/736x/d0/bd/99/d0bd99c46ee6b38c3ae9fc1e5489ac84.jpg",
     text: "Booked them for my parents' anniversary. Traditional flavours done right. Warm service from start to finish.",
   },
   {
     name: "Meera Joshi",
     role: "Pooja · Delhi NCR",
     rating: 5,
+    image: "https://i.pinimg.com/1200x/ad/0e/ee/ad0eee336eaa57314e59f90e95390012.jpg",
     text: "From menu planning to cleanup, everything was smooth. Highly recommend for family poojas and festive gatherings.",
   },
   {
     name: "Aarav Kapoor",
     role: "Wedding · Delhi NCR",
     rating: 5,
+    image: "https://i.pinimg.com/736x/c4/a9/43/c4a943ad73bafe9e4215f1aeba2cdcfc.jpg",
     text: "Handled our wedding feast with calm coordination. Guests praised the taste and the service team stayed reachable throughout.",
   },
 ];
@@ -135,13 +145,7 @@ function ReviewCard({ review }: { review: (typeof reviews)[number] }) {
       <div className="mt-5 border-t border-line pt-4">
         <div className="flex items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-terracotta/15 text-sm font-bold text-terracotta">
-              {review.name
-                .split(" ")
-                .map((p) => p[0])
-                .slice(0, 2)
-                .join("")}
-            </span>
+            <ReviewAvatar name={review.name} src={review.image} />
             <div className="min-w-0">
               <p className="truncate text-sm font-bold text-ink">{review.name}</p>
               <p className="truncate text-xs text-muted">{review.role}</p>
@@ -151,6 +155,38 @@ function ReviewCard({ review }: { review: (typeof reviews)[number] }) {
         </div>
       </div>
     </article>
+  );
+}
+
+function ReviewAvatar({ name, src }: { name: string; src: string }) {
+  const [failed, setFailed] = useState(false);
+  const initials = name
+    .split(" ")
+    .map((p) => p[0])
+    .slice(0, 2)
+    .join("");
+
+  if (failed) {
+    return (
+      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-terracotta/15 text-sm font-bold text-terracotta">
+        {initials}
+      </span>
+    );
+  }
+
+  return (
+    <span className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full ring-1 ring-line">
+      <Image
+        src={src}
+        alt={name}
+        fill
+        sizes="44px"
+        quality={90}
+        unoptimized={src.startsWith("http")}
+        className="object-cover"
+        onError={() => setFailed(true)}
+      />
+    </span>
   );
 }
 

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import ContactForm from "@/components/ContactForm";
-import { citiesLine, emailHref, phoneHref, site } from "@/data/site";
+import { citiesLine, emailHref, mapsEmbedSrc, mapsHref, phoneHref, site } from "@/data/site";
 import Image from "next/image";
 
 export const metadata: Metadata = {
@@ -19,6 +19,11 @@ export default function ContactPage() {
       label: "Email",
       value: site.contact.email,
       href: emailHref(),
+    },
+    {
+      label: "Location",
+      value: site.location.address,
+      href: mapsHref(),
     },
     {
       label: "Service Area",
@@ -88,6 +93,9 @@ export default function ContactPage() {
                     <a
                       href={d.href}
                       className="mt-1 block text-sm font-semibold text-ink hover:text-terracotta"
+                      {...(d.href.startsWith("http")
+                        ? { target: "_blank", rel: "noopener noreferrer" }
+                        : {})}
                     >
                       {d.value}
                     </a>
@@ -112,6 +120,37 @@ export default function ContactPage() {
             Send an enquiry
           </h2>
           <ContactForm />
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-3 pb-10 sm:px-4 md:px-6 md:pb-16">
+        <div className="overflow-hidden rounded-2xl bg-card shadow-sm ring-1 ring-line">
+          <div className="flex flex-wrap items-end justify-between gap-3 px-5 py-4 md:px-6">
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-wide text-muted">
+                Location
+              </p>
+              <p className="mt-1 font-display text-xl font-semibold text-ink md:text-2xl">
+                {site.location.address}
+              </p>
+            </div>
+            <a
+              href={mapsHref()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-full bg-terracotta px-4 py-2 text-xs font-bold uppercase tracking-wide text-white transition hover:bg-terracotta-dark"
+            >
+              Open in Google Maps
+            </a>
+          </div>
+          <iframe
+            title={`${site.brand.name} location`}
+            src={mapsEmbedSrc()}
+            className="h-[min(55vw,360px)] min-h-[280px] w-full border-0 md:h-[380px]"
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            allowFullScreen
+          />
         </div>
       </section>
     </div>
