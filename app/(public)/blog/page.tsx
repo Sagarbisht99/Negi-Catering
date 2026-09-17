@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { listPublishedBlogs } from "@/app/actions/blogs";
 import BlogListing from "@/components/BlogListing";
+import Breadcrumb from "@/components/Breadcrumb";
 import JsonLd from "@/components/JsonLd";
 import { site } from "@/data/site";
 import { breadcrumbJsonLd, buildPageMetadata } from "@/lib/seo";
@@ -27,9 +28,7 @@ export default async function BlogIndexPage() {
       />
       <section className="border-b border-line bg-ivory-deep/50">
         <div className="mx-auto max-w-7xl px-3 py-10 sm:px-4 md:px-6 md:py-16">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-terracotta">
-            Blog
-          </p>
+          <Breadcrumb items={[{ name: "Blog" }]} />
           <h1 className="mt-2 font-display text-3xl font-semibold text-ink sm:text-4xl md:text-5xl">
             Ideas for every occasion
           </h1>

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { listPublishedServices } from "@/app/actions/services";
+import Breadcrumb from "@/components/Breadcrumb";
 import JsonLd from "@/components/JsonLd";
 import ServiceListing from "@/components/ServiceListing";
 import { site } from "@/data/site";
@@ -41,9 +42,7 @@ export default async function ServicesPage() {
           <div className="absolute inset-0 bg-ink/65" />
         </div>
         <div className="relative mx-auto max-w-7xl px-3 py-14 sm:px-4 md:px-6 md:py-28">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-terracotta-soft">
-            Our Services
-          </p>
+          <Breadcrumb variant="dark" items={[{ name: "Services" }]} />
           <h1 className="mt-3 max-w-2xl font-display text-3xl font-semibold text-white sm:text-4xl md:text-6xl">
             Catering for every occasion
           </h1>

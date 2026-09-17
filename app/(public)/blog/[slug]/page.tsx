@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { getPublishedBlogBySlug, listPublishedBlogs } from "@/app/actions/blogs";
 import JsonLd from "@/components/JsonLd";
 import MediaImage from "@/components/MediaImage";
-import { site } from "@/data/site";
+import Breadcrumb from "@/components/Breadcrumb";
 import {
   blogPostingJsonLd,
   breadcrumbJsonLd,
@@ -67,11 +67,13 @@ export default async function BlogDetailPage({ params }: PageProps) {
           <div className="absolute inset-0 bg-ink/65" />
         </div>
         <div className="relative mx-auto max-w-4xl px-3 py-14 sm:px-4 md:px-6 md:py-24">
-          <nav aria-label="Breadcrumb" className="text-xs font-bold uppercase tracking-[0.18em] text-terracotta-soft">
-            <Link href="/blog">Blog</Link>
-            <span className="mx-2 text-white/50">/</span>
-            <span className="text-white/80">Article</span>
-          </nav>
+          <Breadcrumb
+            variant="dark"
+            items={[
+              { name: "Blog", href: "/blog" },
+              { name: blog.title },
+            ]}
+          />
           <h1 className="mt-3 font-display text-3xl font-semibold text-white sm:text-4xl md:text-5xl">
             {blog.title}
           </h1>

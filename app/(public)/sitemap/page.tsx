@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { listPublishedBlogs } from "@/app/actions/blogs";
 import { listPublishedServices } from "@/app/actions/services";
+import Breadcrumb from "@/components/Breadcrumb";
 import { occasions } from "@/data/occasions";
 import { site } from "@/data/site";
 import { buildPageMetadata } from "@/lib/seo";
@@ -89,9 +90,7 @@ export default async function SitemapPage({
     <div className="pb-8">
       <section className="border-b border-line bg-ivory-deep/50">
         <div className="mx-auto max-w-5xl px-3 py-10 sm:px-4 md:px-6 md:py-16">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-terracotta">
-            Site map
-          </p>
+          <Breadcrumb items={[{ name: "Sitemap" }]} />
           <h1 className="mt-2 font-display text-3xl font-semibold text-ink sm:text-4xl md:text-5xl">
             Sitemap
           </h1>

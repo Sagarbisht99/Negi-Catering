@@ -1,3 +1,4 @@
+import Breadcrumb, { type Crumb } from "@/components/Breadcrumb";
 import { site } from "@/data/site";
 import Link from "next/link";
 
@@ -11,16 +12,27 @@ type Props = {
   updated: string;
   intro: string;
   sections: Section[];
+  breadcrumb?: Crumb[];
 };
 
-export default function LegalPage({ title, updated, intro, sections }: Props) {
+export default function LegalPage({
+  title,
+  updated,
+  intro,
+  sections,
+  breadcrumb,
+}: Props) {
   return (
     <div className="pb-8">
       <section className="border-b border-line bg-ivory-deep/50">
         <div className="mx-auto max-w-3xl px-3 py-10 sm:px-4 md:px-6 md:py-16">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-terracotta">
-            Legal
-          </p>
+          {breadcrumb?.length ? (
+            <Breadcrumb items={breadcrumb} className="mb-4" />
+          ) : (
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-terracotta">
+              Legal
+            </p>
+          )}
           <h1 className="mt-2 font-display text-3xl font-semibold text-ink sm:text-4xl md:text-5xl">
             {title}
           </h1>

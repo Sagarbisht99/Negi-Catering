@@ -14,6 +14,7 @@ export const metadata: Metadata = buildPageMetadata({
 export default function TermsPage() {
   return (
     <LegalPage
+      breadcrumb={[{ name: "Terms & Conditions" }]}
       title="Terms & Conditions"
       updated="16 September 2026"
       intro={`These Terms & Conditions govern your use of the ${site.brand.fullName} website and catering/tiffin services across ${site.location.label}. By placing an enquiry or order, you agree to these terms.`}
