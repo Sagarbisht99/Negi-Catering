@@ -11,16 +11,16 @@ import { useEffect, useRef, useState, useTransition } from "react";
 const links = [
   { href: "/admin/dashboard", label: "Dashboard", icon: HomeIcon },
   { href: "/admin/enquiries", label: "Enquiries", icon: EnquiryIcon },
-  { href: "/admin/food", label: "Food", icon: CatalogIcon },
   { href: "/admin/services", label: "Services", icon: ServiceIcon },
+  { href: "/admin/blogs", label: "Blogs", icon: BlogIcon },
   { href: "/admin/offers", label: "Offer Banner", icon: OfferIcon },
 ];
 
 const titles: Record<string, { title: string; subtitle: string }> = {
   "/admin/dashboard": { title: "Dashboard", subtitle: "Overview of your catering" },
   "/admin/enquiries": { title: "Enquiries", subtitle: "Website leads" },
-  "/admin/food": { title: "Food catalog", subtitle: "Manage dishes" },
   "/admin/services": { title: "Services", subtitle: "Manage offerings" },
+  "/admin/blogs": { title: "Blogs", subtitle: "Posts and SEO" },
   "/admin/offers": { title: "Offer banner", subtitle: "ImageKit popup" },
 };
 
@@ -268,21 +268,24 @@ function EnquiryIcon({ active }: { active?: boolean }) {
   );
 }
 
-function CatalogIcon({ active }: { active?: boolean }) {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden className={active ? "text-white" : ""}>
-      <rect x="4" y="4" width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.7" />
-      <rect x="13" y="4" width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.7" />
-      <rect x="4" y="13" width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.7" />
-      <rect x="13" y="13" width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.7" />
-    </svg>
-  );
-}
-
 function ServiceIcon({ active }: { active?: boolean }) {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden className={active ? "text-white" : ""}>
       <path d="M8 7h11M8 12h11M8 17h11M5 7h.01M5 12h.01M5 17h.01" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function BlogIcon({ active }: { active?: boolean }) {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden className={active ? "text-white" : ""}>
+      <path
+        d="M6 5.5h12A1.5 1.5 0 0 1 19.5 7v12.5l-3-2-3 2-3-2-3 2-3-2V7A1.5 1.5 0 0 1 6 5.5Z"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinejoin="round"
+      />
+      <path d="M8.5 9.5h7M8.5 12.5h7M8.5 15.5h4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
     </svg>
   );
 }

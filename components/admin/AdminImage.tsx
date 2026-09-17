@@ -5,10 +5,21 @@ export default function AdminImage({
   alt,
   className,
 }: {
-  src: string;
+  src?: string | null;
   alt: string;
   className?: string;
 }) {
+  if (!src) {
+    return (
+      <div
+        className={`flex items-center justify-center bg-white/5 text-xs text-zinc-500 ${className ?? ""}`}
+        aria-label={alt}
+      >
+        No image
+      </div>
+    );
+  }
+
   const unoptimized =
     src.startsWith("data:") ||
     src.startsWith("blob:") ||

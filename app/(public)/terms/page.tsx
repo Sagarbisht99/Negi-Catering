@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
 import LegalPage from "@/components/LegalPage";
 import { site } from "@/data/site";
+import { buildPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: `Terms & Conditions | ${site.brand.fullName}`,
-  description: `Terms and conditions for using ${site.brand.fullName} catering and tiffin services.`,
-};
+export const revalidate = 86400;
+
+export const metadata: Metadata = buildPageMetadata({
+  title: "Terms & Conditions",
+  description: `Terms and conditions for using ${site.brand.fullName} catering and tiffin services on negicaterer.in.`,
+  path: "/terms",
+});
 
 export default function TermsPage() {
   return (

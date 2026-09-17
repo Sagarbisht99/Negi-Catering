@@ -12,6 +12,7 @@ import AdminImage from "@/components/admin/AdminImage";
 import AdminPagination from "@/components/admin/AdminPagination";
 import ConfirmDialog from "@/components/admin/ConfirmDialog";
 import ImageDropzone from "@/components/admin/ImageDropzone";
+import SeoFields from "@/components/admin/SeoFields";
 import {
   DeleteIcon,
   EditIcon,
@@ -45,6 +46,7 @@ export default function ServiceManager() {
   const [search, setSearch] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<ServiceRecord | null>(null);
   const [viewing, setViewing] = useState<ServiceRecord | null>(null);
+  const [titleForSlug, setTitleForSlug] = useState("");
 
   const rows = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -52,7 +54,9 @@ export default function ServiceManager() {
       (item) =>
         !q ||
         item.name.toLowerCase().includes(q) ||
-        item.description.toLowerCase().includes(q),
+        item.description.toLowerCase().includes(q) ||
+        item.slug.toLowerCase().includes(q) ||
+        item.metaKeywords.toLowerCase().includes(q),
     );
   }, [services.data, search]);
 
@@ -129,7 +133,7 @@ export default function ServiceManager() {
               setSearch(e.target.value);
               pagination.resetPage();
             }}
-            placeholder="Search keyword"
+            placeholder="Search name, slug, or keywords"
             className={adminField}
           />
         </label>
@@ -143,6 +147,7 @@ export default function ServiceManager() {
             className={adminBtn}
             onClick={() => {
               setEditing(null);
+              setTitleForSlug("");
               setImageFile(null);
               setOpen(true);
               setError("");
@@ -184,7 +189,10 @@ export default function ServiceManager() {
                             alt={item.name}
                             className="h-10 w-10 shrink-0 rounded-full object-cover ring-1 ring-white/10"
                           />
-                          <span className="font-medium text-white">{item.name}</span>
+                          <div className="min-w-0">
+                            <span className="font-medium text-white">{item.name}</span>
+                            <p className="truncate text-xs text-zinc-500">/{item.slug}</p>
+                          </div>
                         </div>
                       </td>
                       <td className="hidden max-w-md truncate px-5 py-3 text-zinc-500 md:table-cell">
@@ -224,6 +232,7 @@ export default function ServiceManager() {
                             className={adminIconBtn}
                             onClick={() => {
                               setEditing(item);
+                              setTitleForSlug(item.name);
                               setImageFile(null);
                               setOpen(true);
                               setError("");
@@ -265,7 +274,7 @@ export default function ServiceManager() {
         <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/70 p-4">
           <form
             onSubmit={onSubmit}
-            className="scrollbar-admin max-h-[90vh] w-full max-w-lg space-y-3 overflow-y-auto rounded-2xl bg-[#141414] p-6 ring-1 ring-white/10"
+            className="scrollbar-admin max-h-[90vh] w-full max-w-2xl space-y-3 overflow-y-auto rounded-2xl bg-[#141414] p-6 ring-1 ring-white/10"
           >
             <h2 className="text-xl font-semibold text-white">
               {editing ? "Edit service" : "Add service"}
@@ -273,7 +282,8 @@ export default function ServiceManager() {
             <input
               name="name"
               required
-              defaultValue={editing?.name}
+              value={titleForSlug}
+              onChange={(e) => setTitleForSlug(e.target.value)}
               placeholder="Name"
               className={adminField}
             />
@@ -292,6 +302,20 @@ export default function ServiceManager() {
               existingImage={editing?.image}
               maxBytes={5_000_000}
               onFileSelect={setImageFile}
+            />
+            <SeoFields
+              formKey={editing?.id ?? "new-service"}
+              sourceTitle={titleForSlug}
+              defaults={
+                editing
+                  ? {
+                      slug: editing.slug,
+                      metaTitle: editing.metaTitle,
+                      metaDescription: editing.metaDescription,
+                      metaKeywords: editing.metaKeywords,
+                    }
+                  : undefined
+              }
             />
             <label className="flex items-center gap-2 text-sm text-zinc-300">
               <input
@@ -321,7 +345,7 @@ export default function ServiceManager() {
           onClick={() => setViewing(null)}
         >
           <div
-            className="scrollbar-admin max-h-[90vh] w-full max-w-lg space-y-4 overflow-y-auto rounded-2xl bg-[#141414] p-6 ring-1 ring-white/10"
+            className="scrollbar-admin max-h-[90vh] w-full max-w-2xl space-y-4 overflow-y-auto rounded-2xl bg-[#141414] p-6 ring-1 ring-white/10"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-start justify-between gap-3">
@@ -347,6 +371,24 @@ export default function ServiceManager() {
               <p className="text-xs uppercase tracking-wide text-zinc-500">Description</p>
               <p className="mt-1 text-sm text-zinc-300">{viewing.description}</p>
             </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div>
+                <p className="text-xs uppercase tracking-wide text-zinc-500">Slug</p>
+                <p className="mt-1 text-sm text-zinc-300">/{viewing.slug}</p>
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-wide text-zinc-500">Meta title</p>
+                <p className="mt-1 text-sm text-zinc-300">{viewing.metaTitle || "—"}</p>
+              </div>
+              <div className="sm:col-span-2">
+                <p className="text-xs uppercase tracking-wide text-zinc-500">Meta description</p>
+                <p className="mt-1 text-sm text-zinc-300">{viewing.metaDescription || "—"}</p>
+              </div>
+              <div className="sm:col-span-2">
+                <p className="text-xs uppercase tracking-wide text-zinc-500">Keywords</p>
+                <p className="mt-1 text-sm text-zinc-300">{viewing.metaKeywords || "—"}</p>
+              </div>
+            </div>
             <div className="flex justify-end gap-2">
               <button
                 type="button"
@@ -354,6 +396,7 @@ export default function ServiceManager() {
                 className={adminIconBtn}
                 onClick={() => {
                   setEditing(viewing);
+                  setTitleForSlug(viewing.name);
                   setImageFile(null);
                   setViewing(null);
                   setOpen(true);

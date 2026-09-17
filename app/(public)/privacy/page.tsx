@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
 import LegalPage from "@/components/LegalPage";
 import { site } from "@/data/site";
+import { buildPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: `Privacy Policy | ${site.brand.fullName}`,
-  description: `Privacy policy explaining how ${site.brand.fullName} collects and uses your information.`,
-};
+export const revalidate = 86400;
+
+export const metadata: Metadata = buildPageMetadata({
+  title: "Privacy Policy",
+  description: `Privacy policy explaining how ${site.brand.fullName} collects and uses your information on negicaterer.in.`,
+  path: "/privacy",
+});
 
 export default function PrivacyPage() {
   return (

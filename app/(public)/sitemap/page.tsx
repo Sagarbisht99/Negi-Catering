@@ -1,22 +1,26 @@
 import type { Metadata } from "next";
-import { listPublishedFoods } from "@/app/actions/food";
+import { listPublishedBlogs } from "@/app/actions/blogs";
 import { listPublishedServices } from "@/app/actions/services";
 import { occasions } from "@/data/occasions";
 import { site } from "@/data/site";
+import { buildPageMetadata } from "@/lib/seo";
 import Link from "next/link";
 
-export const metadata: Metadata = {
-  title: `Sitemap | ${site.brand.fullName}`,
-  description: `Browse all pages, services, and dishes on the ${site.brand.name} website.`,
-};
+export const revalidate = 300;
+
+export const metadata: Metadata = buildPageMetadata({
+  title: "Sitemap",
+  description: `Browse all pages, catering services, and blog posts on ${site.brand.name} at negicaterer.in.`,
+  path: "/sitemap",
+});
 
 const PAGE_SIZE = 12;
 
 const staticPages = [
-  { label: "Home", href: "/", blurb: "Hero, food preview, and highlights" },
+  { label: "Home", href: "/", blurb: "Hero and highlights" },
   { label: "About Us", href: "/about", blurb: "Our story and journey" },
-  { label: "Gallery", href: "/gallery", blurb: "Food photos by category" },
   { label: "Services", href: "/services", blurb: "Catering offerings" },
+  { label: "Blog", href: "/blog", blurb: "Tips and inspiration" },
   { label: "Contact Us", href: "/contact", blurb: "Enquiry form and location" },
   { label: "FAQ", href: "/#faq", blurb: "Common questions" },
   { label: "Terms & Conditions", href: "/terms", blurb: "Service terms" },
@@ -28,7 +32,7 @@ type DynamicItem = {
   id: string;
   label: string;
   href: string;
-  kind: "Food" | "Service" | "Occasion";
+  kind: "Service" | "Blog" | "Occasion";
   meta?: string;
 };
 
@@ -44,25 +48,25 @@ export default async function SitemapPage({
   searchParams: Promise<{ page?: string | string[] }>;
 }) {
   const params = await searchParams;
-  const [foods, services] = await Promise.all([
-    listPublishedFoods(),
+  const [services, blogs] = await Promise.all([
     listPublishedServices(),
+    listPublishedBlogs(),
   ]);
 
   const dynamicItems: DynamicItem[] = [
     ...services.map((s) => ({
       id: `service-${s.id}`,
       label: s.name,
-      href: "/services",
+      href: `/services/${s.slug}`,
       kind: "Service" as const,
       meta: s.description,
     })),
-    ...foods.map((f) => ({
-      id: `food-${f.id}`,
-      label: f.name,
-      href: "/gallery",
-      kind: "Food" as const,
-      meta: f.category,
+    ...blogs.map((b) => ({
+      id: `blog-${b.id}`,
+      label: b.title,
+      href: `/blog/${b.slug}`,
+      kind: "Blog" as const,
+      meta: b.excerpt,
     })),
     ...occasions.map((o) => ({
       id: `occasion-${o}`,
@@ -92,7 +96,7 @@ export default async function SitemapPage({
             Sitemap
           </h1>
           <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted md:text-base">
-            Find every page on {site.brand.name} — plus published services, dishes,
+            Find every page on {site.brand.name} — plus published services, blogs,
             and occasions updated from the admin.
           </p>
         </div>
@@ -123,7 +127,7 @@ export default async function SitemapPage({
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
               <h2 className="font-display text-2xl font-semibold text-ink md:text-3xl">
-                Services, food & occasions
+                Services, blogs & occasions
               </h2>
               <p className="mt-1 text-sm text-muted">
                 {total === 0
@@ -135,7 +139,7 @@ export default async function SitemapPage({
 
           {pageItems.length === 0 ? (
             <p className="mt-5 rounded-2xl bg-card px-4 py-10 text-center text-sm text-muted ring-1 ring-line">
-              Dynamic listings will appear here once services and food are published.
+              Dynamic listings will appear here once content is published.
             </p>
           ) : (
             <ul className="mt-5 divide-y divide-line overflow-hidden rounded-2xl bg-card ring-1 ring-line">
@@ -157,11 +161,11 @@ export default async function SitemapPage({
                     </div>
                     <span
                       className={`shrink-0 rounded-md px-2 py-1 text-[10px] font-bold uppercase tracking-wide ${
-                        item.kind === "Food"
-                          ? "bg-leaf/15 text-leaf"
-                          : item.kind === "Service"
-                            ? "bg-terracotta/15 text-terracotta"
-                            : "bg-ink/10 text-ink"
+                        item.kind === "Service"
+                          ? "bg-terracotta/15 text-terracotta"
+                          : item.kind === "Blog"
+                            ? "bg-ink/10 text-ink"
+                            : "bg-ink/5 text-muted"
                       }`}
                     >
                       {item.kind}

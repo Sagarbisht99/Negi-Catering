@@ -1,12 +1,17 @@
 import type { Metadata } from "next";
 import { site } from "@/data/site";
+import { buildPageMetadata } from "@/lib/seo";
 import Image from "next/image";
 import Link from "next/link";
 
-export const metadata: Metadata = {
-  title: `About Us | ${site.brand.fullName}`,
-  description: `${site.brand.fullName} — family catering and tiffin service since ${site.brand.since} across ${site.location.label}.`,
-};
+export const revalidate = 3600;
+
+export const metadata: Metadata = buildPageMetadata({
+  title: "About Us",
+  description: `${site.brand.fullName} — family catering and tiffin service since ${site.brand.since} across ${site.location.label}. Home-style taste, hygienic kitchen, event-ready service.`,
+  keywords: `about Negi Caterers, catering since ${site.brand.since}, tiffin Delhi NCR, family caterers`,
+  path: "/about",
+});
 
 const values = [
   {
@@ -89,10 +94,10 @@ export default function AboutPage() {
             delivery, and food that guests remember.
           </p>
           <Link
-            href="/gallery"
+            href="/services"
             className="mt-6 inline-flex rounded-full bg-terracotta px-5 py-2.5 text-sm font-bold text-white transition hover:bg-terracotta-dark"
           >
-            See Our Food
+            See Our Services
           </Link>
         </div>
       </section>

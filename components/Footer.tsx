@@ -4,15 +4,14 @@ import Link from "next/link";
 
 export default function Footer() {
   const explore = [
-    { label: "Our Food", href: "/gallery" },
     { label: "Services", href: "/services" },
+    { label: "Blog", href: "/blog" },
     { label: "FAQ", href: "/#faq" },
     { label: "About Us", href: "/about" },
   ];
 
   const company = [
     { label: "Contact Us", href: "/contact" },
-    { label: "Gallery", href: "/gallery" },
     { label: "Get a Quote", href: "/contact" },
   ];
 
