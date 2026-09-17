@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { hardcodedServices } from "@/data/services";
+import { listPublishedServices } from "@/app/actions/services";
+import MediaImage from "@/components/MediaImage";
 import { site } from "@/data/site";
 import Image from "next/image";
 import Link from "next/link";
@@ -9,7 +10,9 @@ export const metadata: Metadata = {
   description: `Explore catering services from ${site.brand.name} — daily tiffin, buffet, live counters, office meals, wedding feasts, and pooja prasad across ${site.location.label}.`,
 };
 
-export default function ServicesPage() {
+export default async function ServicesPage() {
+  const services = await listPublishedServices();
+
   return (
     <div>
       <section className="relative overflow-hidden">
@@ -39,64 +42,56 @@ export default function ServicesPage() {
       </section>
 
       <section className="mx-auto max-w-7xl px-3 py-10 sm:px-4 md:px-6 md:py-16">
-        <div className="grid gap-4 md:grid-cols-2 md:gap-5 xl:grid-cols-3">
-          {hardcodedServices.map((service) => (
-            <article
-              key={service.id}
-              className="relative overflow-hidden rounded-[22px] bg-card p-4 shadow-sm ring-1 ring-line sm:rounded-[24px] md:p-6"
-            >
-              <div className="flex flex-wrap gap-2">
-                {service.tag ? (
-                  <span className="rounded-md bg-terracotta px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-white">
-                    {service.tag}
-                  </span>
-                ) : null}
-                <span className="rounded-md bg-ink/80 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-white">
-                  {service.guests}
-                </span>
-              </div>
-              <div className="mt-4 flex gap-3 sm:mt-5 sm:gap-4">
-                <div className="min-w-0 flex-1">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-muted">
-                    {site.brand.name}
-                  </p>
-                  <h2 className="mt-1 font-display text-2xl font-semibold sm:text-3xl">
-                    <span className="text-ink">{service.accent}</span>{" "}
-                    <span className="text-terracotta">{service.title}</span>
-                  </h2>
-                  <p className="mt-2 text-sm leading-relaxed text-muted">
-                    {service.description}
-                  </p>
-                  <ul className="mt-3 space-y-2 sm:mt-4">
-                    {service.points.map((point) => (
-                      <li key={point} className="flex items-center gap-2 text-sm text-ink/80">
-                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-leaf text-[10px] font-bold text-white">
-                          ✓
-                        </span>
-                        {point}
-                      </li>
-                    ))}
-                  </ul>
-                  <Link
-                    href="/contact"
-                    className="mt-4 inline-flex rounded-lg bg-terracotta px-5 py-2 text-sm font-bold text-white transition hover:bg-terracotta-dark sm:mt-5"
-                  >
-                    Enquire
-                  </Link>
-                </div>
-                <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl sm:h-36 sm:w-36 md:h-40 md:w-40">
-                  <Image
-                    src={service.img}
-                    alt={service.title}
-                    fill
-                    className="object-cover"
-                    sizes="160px"
-                  />
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
+        {services.length === 0 ? (
+          <p className="rounded-2xl bg-card px-4 py-12 text-center text-sm text-muted ring-1 ring-line">
+            Services will appear here once they are published in admin.
+          </p>
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2 md:gap-5 xl:grid-cols-3">
+            {services.map((service) => {
+              const words = service.name.trim().split(/\s+/);
+              const accent = words.length > 1 ? words[0] : site.brand.shortName;
+              const title = words.length > 1 ? words.slice(1).join(" ") : service.name;
+
+              return (
+                <article
+                  key={service.id}
+                  className="relative overflow-hidden rounded-[22px] bg-card p-4 shadow-sm ring-1 ring-line sm:rounded-[24px] md:p-6"
+                >
+                  <div className="mt-1 flex flex-col gap-4 sm:flex-row sm:gap-4">
+                    <div className="relative mx-auto h-40 w-full max-w-[220px] shrink-0 overflow-hidden rounded-2xl sm:mx-0 sm:h-36 sm:w-36 sm:max-w-none md:h-40 md:w-40">
+                      <MediaImage
+                        src={service.image}
+                        alt={service.name}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width:640px) 220px, 160px"
+                      />
+                    </div>
+                    <div className="min-w-0 flex-1 text-center sm:text-left">
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-muted">
+                        {site.brand.name}
+                      </p>
+                      <h2 className="mt-1 font-display text-xl font-semibold sm:text-2xl md:text-3xl">
+                        <span className="text-ink">{accent}</span>{" "}
+                        <span className="text-terracotta">{title}</span>
+                      </h2>
+                      <p className="mt-2 text-sm leading-relaxed text-muted">
+                        {service.description}
+                      </p>
+                      <Link
+                        href="/contact"
+                        className="mt-4 inline-flex min-h-11 items-center rounded-lg bg-terracotta px-5 py-2 text-sm font-bold text-white transition hover:bg-terracotta-dark sm:mt-5"
+                      >
+                        Enquire
+                      </Link>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        )}
       </section>
 
       <section className="mx-auto max-w-7xl px-3 pb-12 sm:px-4 md:px-6 md:pb-16">

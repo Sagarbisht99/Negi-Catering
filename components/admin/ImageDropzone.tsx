@@ -1,6 +1,7 @@
 "use client";
 
 import { importLocalImage } from "@/app/actions/localImage";
+import Image from "next/image";
 import { ChangeEvent, DragEvent, useEffect, useId, useRef, useState } from "react";
 
 const DEFAULT_MAX_BYTES = 5_000_000;
@@ -245,10 +246,12 @@ export default function ImageDropzone({
         <div className="pointer-events-none">
           {displayImage ? (
             <div className="space-y-3 p-4">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src={displayImage}
                 alt="Upload preview"
+                width={800}
+                height={400}
+                unoptimized
                 className="mx-auto max-h-52 w-full rounded-lg object-contain"
               />
               {hasNewFile ? (

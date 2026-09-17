@@ -2,9 +2,18 @@
 
 import { useEnquiry } from "@/components/EnquiryProvider";
 import { phoneHref, site, whatsappHref } from "@/data/site";
+import { useEffect, useState } from "react";
 
 export default function FloatingActions() {
   const { openEnquiry, submitted } = useEnquiry();
+  const [showTop, setShowTop] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setShowTop(window.scrollY > 320);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
     <>
@@ -24,7 +33,18 @@ export default function FloatingActions() {
         </button>
       )}
 
-      <div className="fixed right-3 bottom-16 z-[90] flex flex-col gap-3 md:right-6 md:bottom-16">
+      {showTop ? (
+        <button
+          type="button"
+          aria-label="Back to top"
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          className="fixed bottom-[calc(3.25rem+env(safe-area-inset-bottom))] left-3 z-[90] flex h-12 w-12 items-center justify-center rounded-full bg-ink text-white shadow-lg shadow-black/20 transition hover:scale-105 hover:bg-terracotta md:left-6 md:h-14 md:w-14"
+        >
+          <ChevronUpIcon />
+        </button>
+      ) : null}
+
+      <div className="fixed right-3 bottom-[calc(3.25rem+env(safe-area-inset-bottom))] z-[90] flex flex-col gap-3 md:right-6">
         <a
           href={whatsappHref()}
           target="_blank"
@@ -69,6 +89,20 @@ function PhoneIcon() {
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
       <path d="M19.23 15.26l-2.54-.29a1.99 1.99 0 0 0-1.64.57l-1.84 1.84a15.05 15.05 0 0 1-6.59-6.59l1.85-1.85c.43-.42.64-1.03.55-1.64l-.29-2.52A2 2 0 0 0 6.76 3H5.03C3.9 3 2.97 3.96 3.03 5.09c.4 8.07 6.83 14.49 14.9 14.89 1.13.06 2.07-.87 2.07-2v-1.73c0-1.01-.75-1.86-1.77-1.99z" />
+    </svg>
+  );
+}
+
+function ChevronUpIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path
+        d="M6 15l6-6 6 6"
+        stroke="currentColor"
+        strokeWidth="2.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }

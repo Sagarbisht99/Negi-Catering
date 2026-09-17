@@ -4,6 +4,8 @@ import AdminImage from "@/components/admin/AdminImage";
 import { useVisibleOffer } from "@/lib/publicQueries";
 import { useEffect, useState } from "react";
 
+const OPEN_DELAY_MS = 10_000;
+
 export default function OfferPopup() {
   const offer = useVisibleOffer();
   const image = offer.data?.image ?? "";
@@ -11,22 +13,20 @@ export default function OfferPopup() {
 
   useEffect(() => {
     if (!image) return;
-    const key = `negi-offer:${image.slice(0, 80)}`;
-    if (sessionStorage.getItem(key) === "1") return;
-    setOpen(true);
+
+    const id = window.setTimeout(() => {
+      setOpen(true);
+    }, OPEN_DELAY_MS);
+
+    return () => window.clearTimeout(id);
   }, [image]);
 
   if (!open || !image) return null;
 
-  const dismiss = () => {
-    sessionStorage.setItem(`negi-offer:${image.slice(0, 80)}`, "1");
-    setOpen(false);
-  };
-
   return (
     <div
       className="fixed inset-0 z-[110] flex items-center justify-center bg-ink/70 p-4"
-      onClick={dismiss}
+      onClick={() => setOpen(false)}
     >
       <div
         className="relative w-full max-w-lg overflow-hidden rounded-2xl bg-card shadow-2xl"
@@ -35,8 +35,8 @@ export default function OfferPopup() {
         <button
           type="button"
           aria-label="Close offer"
-          onClick={dismiss}
-          className="absolute top-3 right-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-card text-xl font-bold text-ink"
+          onClick={() => setOpen(false)}
+          className="absolute top-3 right-3 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-card text-xl font-bold text-ink"
         >
           ×
         </button>

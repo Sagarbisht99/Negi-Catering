@@ -198,7 +198,7 @@ export default function FoodGallery({ preview = false, showTitle = true }: Props
           <button
             type="button"
             aria-label="Close"
-            className="absolute top-3 right-3 flex h-10 w-10 items-center justify-center rounded-full bg-card text-xl font-bold text-ink sm:top-4 sm:right-4"
+            className="absolute top-3 right-3 flex h-11 w-11 items-center justify-center rounded-full bg-card text-xl font-bold text-ink sm:top-4 sm:right-4"
             onClick={() => setSelected(null)}
           >
             ×
@@ -206,7 +206,7 @@ export default function FoodGallery({ preview = false, showTitle = true }: Props
           <button
             type="button"
             aria-label="Previous"
-            className="absolute left-2 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-card text-xl text-ink sm:left-3 sm:h-10 sm:w-10 md:left-6"
+            className="absolute left-2 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-card text-xl text-ink sm:left-3 md:left-6"
             onClick={(e) => {
               e.stopPropagation();
               shift(-1);
@@ -217,7 +217,7 @@ export default function FoodGallery({ preview = false, showTitle = true }: Props
           <button
             type="button"
             aria-label="Next"
-            className="absolute right-2 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-card text-xl text-ink sm:right-3 sm:h-10 sm:w-10 md:right-6"
+            className="absolute right-2 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-card text-xl text-ink sm:right-3 md:right-6"
             onClick={(e) => {
               e.stopPropagation();
               shift(1);
@@ -227,10 +227,10 @@ export default function FoodGallery({ preview = false, showTitle = true }: Props
           </button>
 
           <div
-            className="relative max-h-[85dvh] w-full max-w-4xl overflow-hidden rounded-2xl bg-card shadow-2xl"
+            className="relative max-h-[85dvh] w-full max-w-4xl overflow-y-auto rounded-2xl bg-card shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="relative aspect-[4/3] w-full md:aspect-[16/10]">
+            <div className="relative aspect-[4/3] max-h-[55dvh] w-full md:aspect-[16/10] md:max-h-none">
               <MediaImage
                 src={selected.image}
                 alt={selected.name}
@@ -240,7 +240,7 @@ export default function FoodGallery({ preview = false, showTitle = true }: Props
                 priority
               />
             </div>
-            <div className="px-5 py-4">
+            <div className="px-4 py-4 sm:px-5">
               <p className="text-xs font-semibold uppercase tracking-wide text-terracotta">
                 {selected.category}
               </p>

@@ -15,7 +15,7 @@ export default function Offerings() {
         Catering Offerings
       </h2>
       {services.isPending ? (
-        <div className="scrollbar-thin mt-6 -mx-4 flex gap-4 overflow-x-auto px-4 pb-2 md:mx-0 md:px-0">
+        <div className="scrollbar-thin mt-6 -mx-3 flex gap-4 overflow-x-auto px-3 pb-2 sm:-mx-4 sm:px-4 md:mx-0 md:px-0">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="flex w-[120px] shrink-0 flex-col items-center gap-2">
               <div className="h-[110px] w-[110px] animate-pulse rounded-2xl bg-card ring-1 ring-line" />
@@ -28,7 +28,7 @@ export default function Offerings() {
           Services will appear here once they are published in admin.
         </p>
       ) : (
-        <div className="scrollbar-thin mt-6 -mx-4 flex gap-4 overflow-x-auto px-4 pb-2 md:mx-0 md:px-0">
+        <div className="scrollbar-thin mt-6 -mx-3 flex gap-4 overflow-x-auto px-3 pb-2 sm:-mx-4 sm:px-4 md:mx-0 md:px-0">
           {items.map((service) => (
             <button
               key={service.id}

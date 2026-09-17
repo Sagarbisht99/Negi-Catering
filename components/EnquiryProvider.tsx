@@ -87,7 +87,7 @@ export function useEnquiry() {
 function EnquirySuccessNotice() {
   return (
     <div className="fixed inset-x-0 bottom-6 z-[130] flex justify-center px-4 pointer-events-none sm:bottom-8">
-      <div className="pointer-events-auto flex max-w-md items-start gap-3 rounded-2xl bg-card px-4 py-4 shadow-xl ring-1 ring-leaf/25 animate-fade-up sm:px-5">
+      <div className="pointer-events-auto mb-[calc(2.5rem+env(safe-area-inset-bottom))] flex max-w-md items-start gap-3 rounded-2xl bg-card px-4 py-4 shadow-xl ring-1 ring-leaf/25 animate-fade-up sm:px-5">
         <span className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-leaf/15 text-leaf">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
             <path

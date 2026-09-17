@@ -17,6 +17,10 @@ export const adminBadgeMuted =
   "inline-flex rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-zinc-400";
 
 export const adminTableHead =
-  "border-y border-white/10 text-xs uppercase tracking-wide text-zinc-500";
+  "sticky top-0 z-10 border-y border-white/10 bg-[#141414] text-xs uppercase tracking-wide text-zinc-500";
 
 export const adminTableRow = "border-b border-white/5 last:border-0 hover:bg-white/[0.02]";
+
+/** Keep long admin lists short — scroll inside instead of growing the page */
+export const adminTableScroll =
+  "scrollbar-admin max-h-[min(52vh,420px)] overflow-auto";

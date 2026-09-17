@@ -1,8 +1,7 @@
 export const occasions = [
   "House Party",
   "Birthday",
-  "Premium",
-  "Office",
+  "Corporate Parties",
   "Anniversary",
   "Pooja",
   "Wedding",

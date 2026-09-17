@@ -1,49 +1,35 @@
 "use client";
 
 import {
-  createOffer,
-  deleteOffer,
-  listOffers,
-  toggleOffer,
-  updateOffer,
-  type OfferRecord,
+  clearOffer,
+  getOffer,
+  saveOffer,
+  setOfferVisible,
 } from "@/app/actions/offers";
 import AdminImage from "@/components/admin/AdminImage";
-import AdminPagination from "@/components/admin/AdminPagination";
 import ConfirmDialog from "@/components/admin/ConfirmDialog";
 import ImageDropzone from "@/components/admin/ImageDropzone";
-import {
-  DeleteIcon,
-  EditIcon,
-  ViewIcon,
-  adminIconBtn,
-} from "@/components/admin/AdminActionIcons";
+import { DeleteIcon, adminIconBtn } from "@/components/admin/AdminActionIcons";
 import {
   adminBadge,
   adminBtn,
   adminGhost,
   adminPanel,
-  adminTableHead,
-  adminTableRow,
 } from "@/components/admin/adminStyles";
-import { usePagination } from "@/components/admin/usePagination";
 import { useToast } from "@/components/Toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useState } from "react";
 
 export default function OfferManager() {
   const toast = useToast();
   const queryClient = useQueryClient();
-  const offers = useQuery({ queryKey: ["offers"], queryFn: listOffers });
-  const [editing, setEditing] = useState<OfferRecord | null>(null);
-  const [open, setOpen] = useState(false);
+  const offerQuery = useQuery({ queryKey: ["offers"], queryFn: getOffer });
+  const offer = offerQuery.data ?? null;
+
+  const [editing, setEditing] = useState(false);
   const [error, setError] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<OfferRecord | null>(null);
-  const [viewing, setViewing] = useState<OfferRecord | null>(null);
-
-  const rows = useMemo(() => offers.data ?? [], [offers.data]);
-  const pagination = usePagination(rows);
+  const [confirmClear, setConfirmClear] = useState(false);
 
   const invalidate = () =>
     Promise.all([
@@ -52,17 +38,13 @@ export default function OfferManager() {
     ]);
 
   const save = useMutation({
-    mutationFn: async (formData: FormData) => {
-      if (editing) await updateOffer(editing.id, formData);
-      else await createOffer(formData);
-    },
+    mutationFn: saveOffer,
     onSuccess: async () => {
       await invalidate();
-      setOpen(false);
-      setEditing(null);
+      setEditing(false);
       setImageFile(null);
       setError("");
-      toast.success(editing ? "Offer updated" : "Offer added");
+      toast.success(offer ? "Offer banner updated" : "Offer banner saved");
     },
     onError: (err: Error) => {
       setError(err.message);
@@ -71,21 +53,21 @@ export default function OfferManager() {
   });
 
   const toggle = useMutation({
-    mutationFn: ({ id, isVisible }: { id: string; isVisible: boolean }) =>
-      toggleOffer(id, isVisible),
-    onSuccess: async (_data, vars) => {
+    mutationFn: setOfferVisible,
+    onSuccess: async (_data, isVisible) => {
       await invalidate();
-      toast.success(vars.isVisible ? "Offer is now visible" : "Offer is now hidden");
+      toast.success(isVisible ? "Banner visible on site" : "Banner hidden");
     },
     onError: (err: Error) => toast.error(err.message),
   });
 
   const remove = useMutation({
-    mutationFn: deleteOffer,
+    mutationFn: clearOffer,
     onSuccess: async () => {
       await invalidate();
-      setDeleteTarget(null);
-      toast.success("Offer deleted");
+      setConfirmClear(false);
+      setEditing(false);
+      toast.success("Offer banner removed");
     },
     onError: (err: Error) => toast.error(err.message),
   });
@@ -100,7 +82,7 @@ export default function OfferManager() {
     const uploaded = formData.get("image");
     const hasFile = uploaded instanceof File && uploaded.size > 0;
 
-    if (!editing && !hasFile) {
+    if (!offer && !hasFile) {
       setError("Image is required");
       return;
     }
@@ -111,135 +93,105 @@ export default function OfferManager() {
   return (
     <section className="space-y-5">
       <div className={`${adminPanel} overflow-hidden`}>
-        <div className="flex items-center justify-between gap-3 px-5 py-4">
+        <div className="flex flex-wrap items-start justify-between gap-3 px-5 py-4">
           <div>
-            <h1 className="text-base font-semibold text-white">Offer banners</h1>
+            <h1 className="text-base font-semibold text-white">Offer banner</h1>
             <p className="mt-1 text-sm text-zinc-500">
-              Upload via ImageKit. Drag & drop images to add or replace.
+              One popup image for the website. Replace anytime via ImageKit.
             </p>
           </div>
-          <button
-            type="button"
-            className={adminBtn}
-            onClick={() => {
-              setEditing(null);
-              setImageFile(null);
-              setOpen(true);
-              setError("");
-            }}
-          >
-            Add offer
-          </button>
+          {offer ? (
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                className={adminBtn}
+                onClick={() => {
+                  setImageFile(null);
+                  setError("");
+                  setEditing(true);
+                }}
+              >
+                Replace image
+              </button>
+              <button
+                type="button"
+                title="Remove banner"
+                aria-label="Remove banner"
+                className={`${adminIconBtn} hover:border-red-500/30 hover:text-red-400`}
+                onClick={() => setConfirmClear(true)}
+              >
+                <DeleteIcon />
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              className={adminBtn}
+              onClick={() => {
+                setImageFile(null);
+                setError("");
+                setEditing(true);
+              }}
+            >
+              Upload banner
+            </button>
+          )}
         </div>
 
-        {offers.isPending ? <p className="px-5 pb-5 text-sm text-zinc-500">Loading...</p> : null}
-        {offers.error ? (
-          <p className="px-5 pb-5 text-sm font-semibold text-terracotta">
-            {(offers.error as Error).message}
-          </p>
+        {offerQuery.isPending ? (
+          <p className="px-5 pb-5 text-sm text-zinc-500">Loading...</p>
         ) : null}
-        {!offers.isPending && !rows.length ? (
-          <p className="px-5 pb-5 text-sm text-zinc-500">
-            No offer banners yet. Upload an image and toggle it on.
+        {offerQuery.error ? (
+          <p className="px-5 pb-5 text-sm font-semibold text-terracotta">
+            {(offerQuery.error as Error).message}
           </p>
         ) : null}
 
-        {rows.length ? (
-          <>
-            <div className="overflow-x-auto">
-              <table className="min-w-full text-left text-sm">
-                <thead className={adminTableHead}>
-                  <tr>
-                    <th className="px-5 py-3 font-medium">Banner</th>
-                    <th className="px-5 py-3 font-medium">Status</th>
-                    <th className="px-5 py-3 text-right font-medium">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {pagination.pageItems.map((item) => (
-                    <tr key={item.id} className={adminTableRow}>
-                      <td className="px-5 py-3">
-                        <AdminImage
-                          src={item.image}
-                          alt="Offer banner"
-                          className="h-16 w-28 rounded-lg object-cover ring-1 ring-white/10"
-                        />
-                      </td>
-                      <td className="px-5 py-3">
-                        <span className={item.isVisible ? adminBadge : "text-zinc-500"}>
-                          {item.isVisible ? "Visible on site" : "Hidden"}
-                        </span>
-                      </td>
-                      <td className="px-5 py-3">
-                        <div className="flex items-center justify-end gap-1.5">
-                          <button
-                            type="button"
-                            title="View"
-                            aria-label="View offer"
-                            className={adminIconBtn}
-                            onClick={() => setViewing(item)}
-                          >
-                            <ViewIcon />
-                          </button>
-                          <button
-                            type="button"
-                            title="Edit"
-                            aria-label="Edit offer"
-                            className={adminIconBtn}
-                            onClick={() => {
-                              setEditing(item);
-                              setImageFile(null);
-                              setOpen(true);
-                              setError("");
-                            }}
-                          >
-                            <EditIcon />
-                          </button>
-                          <button
-                            type="button"
-                            title="Delete"
-                            aria-label="Delete offer"
-                            className={`${adminIconBtn} hover:border-red-500/30 hover:text-red-400`}
-                            onClick={() => setDeleteTarget(item)}
-                          >
-                            <DeleteIcon />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <AdminPagination
-              page={pagination.page}
-              totalPages={pagination.totalPages}
-              total={pagination.total}
-              from={pagination.from}
-              to={pagination.to}
-              hasPrev={pagination.hasPrev}
-              hasNext={pagination.hasNext}
-              onPageChange={pagination.setPage}
+        {!offerQuery.isPending && !offer ? (
+          <p className="px-5 pb-5 text-sm text-zinc-500">
+            No banner yet. Upload one image to show as the site popup.
+          </p>
+        ) : null}
+
+        {offer ? (
+          <div className="space-y-4 border-t border-white/5 px-5 py-5">
+            <AdminImage
+              src={offer.image}
+              alt="Offer banner"
+              className="mx-auto max-h-72 w-full max-w-md rounded-xl object-contain ring-1 ring-white/10"
             />
-          </>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <span className={offer.isVisible ? adminBadge : "text-sm text-zinc-500"}>
+                {offer.isVisible ? "Visible on site" : "Hidden"}
+              </span>
+              <button
+                type="button"
+                disabled={toggle.isPending}
+                className={adminGhost}
+                onClick={() => toggle.mutate(!offer.isVisible)}
+              >
+                {offer.isVisible ? "Hide from website" : "Show on website"}
+              </button>
+            </div>
+          </div>
         ) : null}
       </div>
 
-      {open ? (
+      {editing ? (
         <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/70 p-4">
           <form
             onSubmit={onSubmit}
             className="scrollbar-admin max-h-[90vh] w-full max-w-lg space-y-4 overflow-y-auto rounded-2xl bg-[#141414] p-6 ring-1 ring-white/10"
           >
             <h2 className="text-xl font-semibold text-white">
-              {editing ? "Edit offer" : "Add offer"}
+              {offer ? "Replace offer banner" : "Upload offer banner"}
             </h2>
 
             <ImageDropzone
-              key={editing?.id ?? "new"}
+              key={offer?.id ?? "new"}
               label="Offer banner image"
-              required={!editing}
-              existingImage={editing?.image}
+              required={!offer}
+              existingImage={offer?.image}
               maxBytes={5_000_000}
               onFileSelect={setImageFile}
             />
@@ -248,7 +200,7 @@ export default function OfferManager() {
               <input
                 type="checkbox"
                 name="isVisible"
-                defaultChecked={editing?.isVisible}
+                defaultChecked={offer?.isVisible ?? true}
                 className="rounded border-white/20 bg-[#121212] text-terracotta focus:ring-terracotta"
               />
               Show this banner on the website
@@ -257,7 +209,11 @@ export default function OfferManager() {
             {error ? <p className="text-sm font-semibold text-terracotta">{error}</p> : null}
 
             <div className="flex justify-end gap-2">
-              <button type="button" onClick={() => setOpen(false)} className={adminGhost}>
+              <button
+                type="button"
+                onClick={() => setEditing(false)}
+                className={adminGhost}
+              >
                 Cancel
               </button>
               <button type="submit" disabled={save.isPending} className={adminBtn}>
@@ -268,79 +224,15 @@ export default function OfferManager() {
         </div>
       ) : null}
 
-      {viewing ? (
-        <div
-          className="fixed inset-0 z-[80] flex items-center justify-center bg-black/70 p-4"
-          onClick={() => setViewing(null)}
-        >
-          <div
-            className="scrollbar-admin max-h-[90vh] w-full max-w-lg space-y-4 overflow-y-auto rounded-2xl bg-[#141414] p-6 ring-1 ring-white/10"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-start justify-between gap-3">
-              <h2 className="text-xl font-semibold text-white">Offer banner</h2>
-              <button type="button" onClick={() => setViewing(null)} className={adminGhost}>
-                Close
-              </button>
-            </div>
-            <AdminImage
-              src={viewing.image}
-              alt="Offer banner"
-              className="h-48 w-full rounded-xl object-cover ring-1 ring-white/10"
-            />
-            <p className="text-sm text-zinc-400">
-              {viewing.isVisible ? "Visible on website" : "Hidden from website"}
-            </p>
-            <div className="flex flex-wrap items-center justify-end gap-2">
-              <button
-                type="button"
-                disabled={toggle.isPending}
-                className={adminGhost}
-                onClick={() => {
-                  toggle.mutate({ id: viewing.id, isVisible: !viewing.isVisible });
-                  setViewing({ ...viewing, isVisible: !viewing.isVisible });
-                }}
-              >
-                {viewing.isVisible ? "Hide" : "Show"}
-              </button>
-              <button
-                type="button"
-                title="Edit"
-                className={adminIconBtn}
-                onClick={() => {
-                  setEditing(viewing);
-                  setImageFile(null);
-                  setViewing(null);
-                  setOpen(true);
-                  setError("");
-                }}
-              >
-                <EditIcon />
-              </button>
-              <button
-                type="button"
-                title="Delete"
-                className={`${adminIconBtn} hover:border-red-500/30 hover:text-red-400`}
-                onClick={() => setDeleteTarget(viewing)}
-              >
-                <DeleteIcon />
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
-
       <ConfirmDialog
-        open={Boolean(deleteTarget)}
-        title="Are you sure to delete?"
-        message="This will permanently delete this offer banner. This action cannot be undone."
-        confirmLabel="Delete"
+        open={confirmClear}
+        title="Remove offer banner?"
+        message="This permanently deletes the popup banner. You can upload a new one later."
+        confirmLabel="Remove"
         danger
         loading={remove.isPending}
-        onCancel={() => setDeleteTarget(null)}
-        onConfirm={() => {
-          if (deleteTarget) remove.mutate(deleteTarget.id);
-        }}
+        onCancel={() => setConfirmClear(false)}
+        onConfirm={() => remove.mutate()}
       />
     </section>
   );

@@ -65,9 +65,10 @@ export default function AboutPage() {
       <section className="mx-auto grid max-w-7xl gap-8 px-3 py-10 sm:px-4 md:grid-cols-2 md:items-center md:gap-10 md:px-6 md:py-20">
         <div className="relative aspect-[4/3] overflow-hidden rounded-[28px] shadow-sm ring-1 ring-line">
           <Image
-            src="/images/chef.jpg"
-            alt="Our kitchen team"
+            src="https://i.pinimg.com/736x/e2/d7/cb/e2d7cb2aa32ad091923f6d86bf9ed093.jpg"
+            alt="Servers plating meals at a catering event"
             fill
+            quality={90}
             className="object-cover"
             sizes="(max-width:768px) 100vw, 50vw"
           />

@@ -3,6 +3,7 @@
 import { logoutAction } from "@/app/actions/auth";
 import ConfirmDialog from "@/components/admin/ConfirmDialog";
 import { site } from "@/data/site";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
@@ -95,10 +96,11 @@ export default function AdminShell({
             title={site.brand.name}
             className="shrink-0"
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <Image
               src="/favicon-192.png"
               alt={site.brand.name}
+              width={40}
+              height={40}
               className={`rounded-lg object-cover ring-1 ring-white/10 ${
                 collapsed && mounted ? "h-8 w-8" : "h-10 w-10"
               }`}

@@ -21,10 +21,10 @@ export default function StatsBanner() {
               <span className="h-2 w-2 rounded-full bg-terracotta" />
               Delhi NCR&apos;s family caterers
             </p>
-            <p className="mt-2 font-display text-5xl font-bold tracking-tight text-ink sm:text-6xl lg:text-7xl">
+            <p className="mt-2 font-display text-4xl font-bold tracking-tight text-ink sm:text-6xl lg:text-7xl">
               {years}+
             </p>
-            <p className="mt-1 text-xl font-bold text-ink sm:text-2xl">
+            <p className="mt-1 text-lg font-bold text-ink sm:text-2xl">
               Years of Trust
             </p>
             <p className="mt-3 max-w-[260px] text-sm leading-relaxed text-muted">
@@ -33,19 +33,19 @@ export default function StatsBanner() {
             </p>
           </div>
 
-          <div className="flex min-w-0 flex-1 items-stretch justify-between md:max-w-xl md:justify-end">
+          <div className="grid min-w-0 flex-1 grid-cols-3 gap-2 sm:gap-0 md:max-w-xl md:justify-end">
             {stats.map((s, i) => (
               <div
                 key={s.label}
-                className={`flex flex-1 flex-col items-center px-2 text-center sm:px-5 ${
-                  i > 0 ? "border-l border-terracotta/25" : ""
+                className={`flex flex-col items-center px-1 text-center sm:flex-1 sm:px-5 ${
+                  i > 0 ? "sm:border-l sm:border-terracotta/25" : ""
                 }`}
               >
-                <p className="inline-flex items-baseline gap-1 font-display text-3xl font-bold text-terracotta sm:text-4xl lg:text-5xl">
+                <p className="inline-flex items-baseline gap-0.5 font-display text-2xl font-bold text-terracotta sm:gap-1 sm:text-4xl lg:text-5xl">
                   {s.value}
                   {s.star ? <Star /> : null}
                 </p>
-                <p className="mt-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-muted sm:text-[11px]">
+                <p className="mt-1.5 text-[9px] font-bold uppercase tracking-[0.1em] text-muted sm:text-[11px] sm:tracking-[0.14em]">
                   {s.label}
                 </p>
               </div>

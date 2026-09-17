@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default function AdminImage({
   src,
   alt,
@@ -7,9 +9,21 @@ export default function AdminImage({
   alt: string;
   className?: string;
 }) {
+  const unoptimized =
+    src.startsWith("data:") ||
+    src.startsWith("blob:") ||
+    src.startsWith("http://") ||
+    src.startsWith("https://");
+
   return (
-    // Images may be ImageKit URLs or legacy data URLs.
-    // eslint-disable-next-line @next/next/no-img-element
-    <img src={src} alt={alt} className={className} />
+    <Image
+      src={src}
+      alt={alt}
+      width={800}
+      height={600}
+      quality={90}
+      unoptimized={unoptimized}
+      className={className}
+    />
   );
 }
