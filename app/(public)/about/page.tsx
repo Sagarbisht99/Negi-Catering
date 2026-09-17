@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { site } from "@/data/site";
 import { buildPageMetadata } from "@/lib/seo";
+import Breadcrumb from "@/components/Breadcrumb";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -54,9 +55,10 @@ export default function AboutPage() {
           <div className="absolute inset-0 bg-ink/65" />
         </div>
         <div className="relative mx-auto max-w-7xl px-3 py-14 sm:px-4 md:px-6 md:py-28">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-terracotta-soft">
-            {site.brand.sinceLabel}
-          </p>
+          <Breadcrumb
+            variant="dark"
+            items={[{ name: "About Us" }]}
+          />
           <h1 className="mt-3 max-w-2xl font-display text-3xl font-semibold text-white sm:text-4xl md:text-6xl">
             About {site.brand.fullName}
           </h1>
@@ -67,19 +69,22 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-8 px-3 py-10 sm:px-4 md:grid-cols-2 md:items-center md:gap-10 md:px-6 md:py-20">
-        <div className="relative aspect-[4/3] overflow-hidden rounded-[28px] shadow-sm ring-1 ring-line">
+      <section className="mx-auto grid max-w-7xl items-stretch gap-8 px-3 py-10 sm:px-4 md:grid-cols-2 md:gap-10 md:px-6 md:py-20">
+        <div className="relative min-h-[280px] overflow-hidden rounded-[28px] shadow-sm ring-1 ring-line md:min-h-0">
           <Image
-            src="https://i.pinimg.com/736x/e2/d7/cb/e2d7cb2aa32ad091923f6d86bf9ed093.jpg"
-            alt="Servers plating meals at a catering event"
+            src="/images/about-feast.png"
+            alt="Indian catering feast with curries, rice, naan and tandoori"
             fill
             quality={90}
             className="object-cover"
             sizes="(max-width:768px) 100vw, 50vw"
           />
         </div>
-        <div>
-          <h2 className="font-display text-2xl font-semibold text-ink sm:text-3xl md:text-4xl">
+        <div className="flex flex-col justify-center">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-terracotta">
+            {site.brand.sinceLabel}
+          </p>
+          <h2 className="mt-2 font-display text-2xl font-semibold text-ink sm:text-3xl md:text-4xl">
             Our Story
           </h2>
           <p className="mt-4 text-sm leading-relaxed text-muted md:text-base">
@@ -93,9 +98,28 @@ export default function AboutPage() {
             festivals with the same care: clear communication, punctual
             delivery, and food that guests remember.
           </p>
+          <p className="mt-3 text-sm leading-relaxed text-muted md:text-base">
+            Whether you need a simple tray delivery or a full buffet with live
+            counters, we stay reachable from the first enquiry to the last plate
+            — so your gathering feels warm, organised, and completely yours.
+          </p>
+          <ul className="mt-5 space-y-2.5 border-t border-line pt-5">
+            <li className="flex items-start gap-2.5 text-sm font-medium text-ink">
+              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-terracotta" aria-hidden />
+              Classic recipes, cooked fresh for every order
+            </li>
+            <li className="flex items-start gap-2.5 text-sm font-medium text-ink">
+              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-terracotta" aria-hidden />
+              Hygienic kitchen and careful packing
+            </li>
+            <li className="flex items-start gap-2.5 text-sm font-medium text-ink">
+              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-terracotta" aria-hidden />
+              Event-ready service for every guest count
+            </li>
+          </ul>
           <Link
             href="/services"
-            className="mt-6 inline-flex rounded-full bg-terracotta px-5 py-2.5 text-sm font-bold text-white transition hover:bg-terracotta-dark"
+            className="mt-6 inline-flex w-fit rounded-full bg-terracotta px-5 py-2.5 text-sm font-bold text-white transition hover:bg-terracotta-dark"
           >
             See Our Services
           </Link>

@@ -6,6 +6,7 @@ import {
 } from "@/app/actions/services";
 import JsonLd from "@/components/JsonLd";
 import MediaImage from "@/components/MediaImage";
+import Breadcrumb from "@/components/Breadcrumb";
 import { site } from "@/data/site";
 import {
   breadcrumbJsonLd,
@@ -69,11 +70,13 @@ export default async function ServiceDetailPage({ params }: PageProps) {
           <div className="absolute inset-0 bg-ink/65" />
         </div>
         <div className="relative mx-auto max-w-7xl px-3 py-14 sm:px-4 md:px-6 md:py-28">
-          <nav aria-label="Breadcrumb" className="text-xs font-bold uppercase tracking-[0.18em] text-terracotta-soft">
-            <Link href="/services">Our Services</Link>
-            <span className="mx-2 text-white/50">/</span>
-            <span className="text-white/80">Details</span>
-          </nav>
+          <Breadcrumb
+            variant="dark"
+            items={[
+              { name: "Services", href: "/services" },
+              { name: service.name },
+            ]}
+          />
           <h1 className="mt-3 max-w-2xl font-display text-3xl font-semibold text-white sm:text-4xl md:text-6xl">
             {service.name}
           </h1>

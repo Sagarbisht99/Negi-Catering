@@ -14,6 +14,7 @@ export const metadata: Metadata = buildPageMetadata({
 export default function PrivacyPage() {
   return (
     <LegalPage
+      breadcrumb={[{ name: "Privacy Policy" }]}
       title="Privacy Policy"
       updated="16 September 2026"
       intro={`${site.brand.fullName} respects your privacy. This policy explains what information we collect through enquiries and how we use it to serve your catering needs.`}

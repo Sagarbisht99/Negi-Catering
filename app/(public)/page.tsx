@@ -4,9 +4,12 @@ import { listPublishedServices } from "@/app/actions/services";
 import BlogSection from "@/components/BlogSection";
 import Faq from "@/components/Faq";
 import Hero from "@/components/Hero";
+import HomeCta from "@/components/HomeCta";
 import HowItWorks from "@/components/HowItWorks";
 import JsonLd from "@/components/JsonLd";
+import MenuHighlight from "@/components/MenuHighlight";
 import Occasions from "@/components/Occasions";
+import OurStory from "@/components/OurStory";
 import StatsBanner from "@/components/StatsBanner";
 import Testimonials from "@/components/Testimonials";
 import WhyChooseUs from "@/components/WhyChooseUs";
@@ -41,9 +44,12 @@ export default async function Home() {
       <Occasions initialServices={services} />
       <StatsBanner />
       <WhyChooseUs />
+      <MenuHighlight />
       <HowItWorks />
+      <OurStory />
       <BlogSection blogs={blogs} />
       <Testimonials />
+      <HomeCta />
       <Faq />
     </>
   );

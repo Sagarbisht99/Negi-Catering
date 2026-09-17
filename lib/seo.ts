@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getSiteUrl, site, whatsappHref } from "@/data/site";
+import { getSiteUrl, mapsHref, site, whatsappHref } from "@/data/site";
 import { faqItems } from "@/data/faq";
 
 export type SeoFields = {
@@ -120,6 +120,12 @@ export function localBusinessJsonLd() {
       postalCode: site.location.postalCode,
       addressCountry: site.location.addressCountry,
     },
+    geo: {
+      "@type": "GeoCoordinates",
+      latitude: site.location.lat,
+      longitude: site.location.lng,
+    },
+    hasMap: mapsHref(),
     areaServed: {
       "@type": "Place",
       name: site.location.label,

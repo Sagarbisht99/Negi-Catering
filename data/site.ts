@@ -5,6 +5,9 @@
 export const SITE_DOMAIN = "negicaterer.in";
 export const SITE_ORIGIN = `https://${SITE_DOMAIN}`;
 
+const MAPS_URL =
+  "https://www.google.com/maps/place/MAA+PITAMBARA+MEDICOS/@28.5908945,77.3094569,20.33z/data=!4m14!1m7!3m6!1s0x390ce4f30027dabd:0xe463c9af036d026a!2sDev+medicos!8m2!3d28.594286!4d77.3117633!16s%2Fg%2F1td56_d5!3m5!1s0x390ce500749d7573:0x26618f42985ec377!8m2!3d28.5908977!4d77.3096745!16s%2Fg%2F11wbtgdb5c?entry=ttu&g_ep=EgoyMDI2MDkxNC4wIKXMDSoASAFQAw%3D%3D";
+
 export const site = {
   brand: {
     shortName: "Negi",
@@ -32,16 +35,20 @@ export const site = {
   },
   location: {
     label: "Delhi NCR",
-    address: "A-136, New Ashok Nagar, Gali No. 13, Delhi — 110096",
+    address:
+      "A-136, New Ashok Nagar Rd, Block A, New Ashok Nagar, New Delhi, Delhi 110096",
     postalCode: "110096",
     addressRegion: "Delhi",
     addressLocality: "New Ashok Nagar",
     addressCountry: "IN",
+    lat: 28.5908977,
+    lng: 77.3096745,
+    mapsUrl: MAPS_URL,
   },
   reviews: {
     rating: 4.8,
     count: 128,
-    googleUrl: "https://www.google.com/maps/search/?api=1&query=A-136,+New+Ashok+Nagar,+Gali+No.+13,+Delhi+110096",
+    googleUrl: MAPS_URL,
   },
   seo: {
     title: "Negi Caterers and Tiffin | Catering & Tiffin in Delhi NCR Since 1960",
@@ -79,10 +86,11 @@ export function citiesLine() {
   return site.location.label;
 }
 
-export function mapsHref(address = site.location.address) {
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+export function mapsHref() {
+  return site.location.mapsUrl;
 }
 
-export function mapsEmbedSrc(address = site.location.address) {
-  return `https://maps.google.com/maps?q=${encodeURIComponent(address)}&output=embed`;
+export function mapsEmbedSrc() {
+  const { lat, lng } = site.location;
+  return `https://maps.google.com/maps?q=${lat},${lng}&z=17&output=embed`;
 }
