@@ -153,7 +153,7 @@ export default function OfferManager() {
           </p>
         ) : null}
 
-        {offer ? (
+        {offer?.image ? (
           <div className="space-y-4 border-t border-white/5 px-5 py-5">
             <AdminImage
               src={offer.image}

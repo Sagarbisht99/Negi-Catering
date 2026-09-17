@@ -2,6 +2,9 @@
  * Single source of truth for site identity.
  * Update numbers/email here — FloatingActions, Footer, Contact, Header all use this.
  */
+export const SITE_DOMAIN = "negicaterer.in";
+export const SITE_ORIGIN = `https://${SITE_DOMAIN}`;
+
 export const site = {
   brand: {
     shortName: "Negi",
@@ -11,6 +14,8 @@ export const site = {
     since: 1960,
     sinceLabel: "Since 1960",
     logo: "/logo.png",
+    /** Default social / Open Graph share image (1200-friendly landscape) */
+    ogImage: "/images/feast.jpg",
     description:
       "Negi Caterers and Tiffin has been serving families and celebrations since 1960 — for small gatherings or large groups, at home or at the office.",
   },
@@ -23,23 +28,37 @@ export const site = {
     phoneDisplay: "+91 93151 13011",
     email: "Pratyaksh25negi@gmail.com",
     hours: "Mon–Sun · 9:00 AM – 9:00 PM",
+    openingHoursSpec: "Mo-Su 09:00-21:00",
   },
   location: {
     label: "Delhi NCR",
     address: "A-136, New Ashok Nagar, Gali No. 13, Delhi — 110096",
+    postalCode: "110096",
+    addressRegion: "Delhi",
+    addressLocality: "New Ashok Nagar",
+    addressCountry: "IN",
   },
   reviews: {
     rating: 4.8,
     count: 128,
-    /** Update with your real Google Business reviews link later */
-    googleUrl: "https://www.google.com/maps",
+    googleUrl: "https://www.google.com/maps/search/?api=1&query=A-136,+New+Ashok+Nagar,+Gali+No.+13,+Delhi+110096",
   },
   seo: {
-    title: "Negi Caterers and Tiffin Services | Since 1960",
+    title: "Negi Caterers and Tiffin | Catering & Tiffin in Delhi NCR Since 1960",
     description:
-      "Traditional catering and tiffin service for every occasion — house parties, weddings, offices, and festivals. Since 1960.",
+      "Book Negi Caterers and Tiffin for weddings, house parties, office meals, buffet and daily tiffin across Delhi NCR. Hygienic kitchen, home-style taste — since 1960.",
+    keywords:
+      "Negi Caterers, Negi Caterer, catering Delhi NCR, tiffin service Delhi, wedding catering Delhi, buffet catering, office catering, home party catering, pooja prasad, New Ashok Nagar catering, negicaterer.in",
   },
 } as const;
+
+export function getSiteUrl() {
+  const fromEnv = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "");
+  if (fromEnv) return fromEnv;
+  if (process.env.NODE_ENV === "production") return SITE_ORIGIN;
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL.replace(/\/$/, "")}`;
+  return "http://localhost:3000";
+}
 
 export function phoneHref(phone = site.contact.phone) {
   return `tel:${phone}`;

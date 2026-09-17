@@ -1,8 +1,7 @@
 import mongoose, { Schema } from "mongoose";
-import { enquiryStatuses } from "@/data/enquiry";
 
-export type { EnquiryStatus } from "@/data/enquiry";
-export { enquiryStatuses } from "@/data/enquiry";
+export const enquiryStatuses = ["pending", "followup", "resolved"] as const;
+export type EnquiryStatus = (typeof enquiryStatuses)[number];
 
 const EnquirySchema = new Schema(
   {

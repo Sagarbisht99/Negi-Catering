@@ -1,7 +1,7 @@
 "use client";
 
+import { listBlogs } from "@/app/actions/blogs";
 import { listEnquiries } from "@/app/actions/enquiries";
-import { listFoods } from "@/app/actions/food";
 import { listOffers } from "@/app/actions/offers";
 import { listServices } from "@/app/actions/services";
 import { adminPanel } from "@/components/admin/adminStyles";
@@ -16,16 +16,16 @@ const cards = [
     queryFn: listEnquiries,
   },
   {
-    title: "Food",
-    href: "/admin/food",
-    queryKey: ["foods"] as const,
-    queryFn: listFoods,
-  },
-  {
     title: "Services",
     href: "/admin/services",
     queryKey: ["services"] as const,
     queryFn: listServices,
+  },
+  {
+    title: "Blogs",
+    href: "/admin/blogs",
+    queryKey: ["blogs"] as const,
+    queryFn: listBlogs,
   },
   {
     title: "Offer banner",
@@ -37,14 +37,14 @@ const cards = [
 
 export default function DashboardStats() {
   const enquiries = useQuery({ queryKey: cards[0].queryKey, queryFn: cards[0].queryFn });
-  const foods = useQuery({ queryKey: cards[1].queryKey, queryFn: cards[1].queryFn });
-  const services = useQuery({ queryKey: cards[2].queryKey, queryFn: cards[2].queryFn });
+  const services = useQuery({ queryKey: cards[1].queryKey, queryFn: cards[1].queryFn });
+  const blogs = useQuery({ queryKey: cards[2].queryKey, queryFn: cards[2].queryFn });
   const offers = useQuery({ queryKey: cards[3].queryKey, queryFn: cards[3].queryFn });
 
   const stats = [
     { ...cards[0], query: enquiries },
-    { ...cards[1], query: foods },
-    { ...cards[2], query: services },
+    { ...cards[1], query: services },
+    { ...cards[2], query: blogs },
     { ...cards[3], query: offers },
   ];
 
@@ -53,7 +53,7 @@ export default function DashboardStats() {
       <div>
         <h1 className="text-2xl font-semibold text-white">Dashboard</h1>
         <p className="mt-1 text-sm text-zinc-500">
-          Overview of enquiries, food, services, and the offer banner.
+          Overview of enquiries, services, blogs, and the offer banner.
         </p>
       </div>
 

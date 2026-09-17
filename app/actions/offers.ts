@@ -38,7 +38,10 @@ export async function getOffer(): Promise<OfferRecord | null> {
   await requireAdmin();
   await dbConnect();
   const row = await keepSingleOffer();
-  return row ? serializeDoc<OfferRecord>(row) : null;
+  if (!row) return null;
+  const offer = serializeDoc<OfferRecord>(row);
+  if (!offer.image) return null;
+  return offer;
 }
 
 /** @deprecated Use getOffer — kept for dashboard until callers update */
@@ -54,7 +57,10 @@ export async function getVisibleOffer(): Promise<OfferRecord | null> {
     const row = await OfferBanner.findOne({ isVisible: true })
       .sort({ createdAt: -1 })
       .lean();
-    return row ? serializeDoc<OfferRecord>(row) : null;
+    if (!row) return null;
+    const offer = serializeDoc<OfferRecord>(row);
+    if (!offer.image) return null;
+    return offer;
   } catch {
     return null;
   }

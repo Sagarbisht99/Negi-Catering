@@ -7,15 +7,13 @@ type Props = {
   className?: string;
   sizes?: string;
   priority?: boolean;
+  quality?: number;
 };
 
-function isExternalSrc(src: string) {
-  return (
-    src.startsWith("data:") ||
-    src.startsWith("blob:") ||
-    src.startsWith("http://") ||
-    src.startsWith("https://")
-  );
+function needsUnoptimized(src: string) {
+  // Next can optimize http(s) remotes listed in next.config remotePatterns.
+  // Only skip the optimizer for inline / temporary blob URLs.
+  return src.startsWith("data:") || src.startsWith("blob:");
 }
 
 export default function MediaImage({
@@ -25,8 +23,11 @@ export default function MediaImage({
   className,
   sizes,
   priority,
+  quality = 75,
 }: Props) {
-  const unoptimized = isExternalSrc(src);
+  if (!src) return null;
+
+  const unoptimized = needsUnoptimized(src);
 
   if (fill) {
     return (
@@ -34,9 +35,9 @@ export default function MediaImage({
         src={src}
         alt={alt}
         fill
-        sizes={sizes ?? "100vw"}
+        sizes={sizes ?? "(max-width: 768px) 100vw, 50vw"}
         priority={priority}
-        quality={90}
+        quality={quality}
         unoptimized={unoptimized}
         className={className}
       />
@@ -50,9 +51,10 @@ export default function MediaImage({
       width={800}
       height={600}
       priority={priority}
-      quality={90}
+      quality={quality}
       unoptimized={unoptimized}
       className={className}
+      sizes={sizes}
     />
   );
 }

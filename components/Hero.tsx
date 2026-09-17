@@ -1,25 +1,26 @@
 "use client";
 
 import { useEnquiry } from "@/components/EnquiryProvider";
+import { site } from "@/data/site";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
 const slides = [
   {
     src: "/images/banner-why.png",
-    alt: "Why choose Negi Caterers & Tiffin",
+    alt: `${site.brand.name} — why families choose us for catering and tiffin`,
   },
   {
     src: "/images/banner-event.png",
-    alt: "Your event, just a click away",
+    alt: `Plan your event with ${site.brand.name}`,
   },
   {
     src: "/images/banner-corporate.png",
-    alt: "Corporate catering made easy",
+    alt: `Corporate catering by ${site.brand.name}`,
   },
   {
     src: "/images/banner-india.png",
-    alt: "Trusted catering across India",
+    alt: `Trusted catering across ${site.location.label}`,
   },
 ];
 
@@ -30,32 +31,42 @@ export default function Hero() {
   useEffect(() => {
     const id = window.setInterval(() => {
       setIndex((i) => (i + 1) % slides.length);
-    }, 4000);
+    }, 4500);
     return () => window.clearInterval(id);
   }, []);
 
   return (
-    <section className="px-3 pt-3 sm:px-4 md:px-6 md:pt-5">
+    <section className="px-3 pt-3 sm:px-4 md:px-6 md:pt-5" aria-label="Featured highlights">
+      <h1 className="sr-only">
+        {site.brand.fullName} — catering and tiffin services in {site.location.label} since{" "}
+        {site.brand.since}
+      </h1>
       <div className="relative mx-auto min-h-[220px] aspect-[4/3] max-w-7xl overflow-hidden rounded-[16px] bg-card shadow-sm ring-1 ring-line sm:min-h-0 sm:aspect-[16/9] sm:rounded-[20px] md:aspect-[1024/504] md:rounded-[32px]">
-        {slides.map((slide, i) => (
-          <div
-            key={slide.src}
-            className={`absolute inset-0 transition-opacity duration-700 ease-out ${
-              i === index ? "opacity-100" : "pointer-events-none opacity-0"
-            }`}
-          >
-            <Image
-              src={slide.src}
-              alt={slide.alt}
-              fill
-              priority={i === 0}
-              quality={100}
-              unoptimized
-              className="object-cover object-center sm:object-contain"
-              sizes="100vw"
-            />
-          </div>
-        ))}
+        {slides.map((slide, i) => {
+          const active = i === index;
+          const nearby = Math.abs(i - index) <= 1 || (index === 0 && i === slides.length - 1);
+          if (!active && !nearby && i !== 0) return null;
+
+          return (
+            <div
+              key={slide.src}
+              className={`absolute inset-0 transition-opacity duration-700 ease-out ${
+                active ? "opacity-100" : "pointer-events-none opacity-0"
+              }`}
+              aria-hidden={!active}
+            >
+              <Image
+                src={slide.src}
+                alt={slide.alt}
+                fill
+                priority={i === 0}
+                quality={75}
+                className="object-cover object-center sm:object-contain"
+                sizes="(max-width: 768px) 100vw, min(1280px, 100vw)"
+              />
+            </div>
+          );
+        })}
 
         {submitted ? null : (
           <button
@@ -73,6 +84,7 @@ export default function Hero() {
               key={slide.src}
               type="button"
               aria-label={`Go to slide ${i + 1}`}
+              aria-current={i === index ? "true" : undefined}
               onClick={() => setIndex(i)}
               className="flex h-10 w-10 items-center justify-center"
             >

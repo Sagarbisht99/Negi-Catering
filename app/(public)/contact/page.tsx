@@ -1,12 +1,17 @@
 import type { Metadata } from "next";
 import ContactForm from "@/components/ContactForm";
 import { citiesLine, emailHref, mapsEmbedSrc, mapsHref, phoneHref, site } from "@/data/site";
+import { buildPageMetadata } from "@/lib/seo";
 import Image from "next/image";
 
-export const metadata: Metadata = {
-  title: `Contact Us | ${site.brand.fullName}`,
-  description: `Contact ${site.brand.fullName} for catering quotes, tiffin orders, and event bookings across ${site.location.label}.`,
-};
+export const revalidate = 3600;
+
+export const metadata: Metadata = buildPageMetadata({
+  title: "Contact Us",
+  description: `Contact ${site.brand.fullName} for catering quotes, tiffin orders, and event bookings across ${site.location.label}. Call ${site.contact.phoneDisplay} or send an enquiry online.`,
+  keywords: `contact Negi Caterers, catering quote Delhi, tiffin booking, ${site.location.addressLocality}`,
+  path: "/contact",
+});
 
 export default function ContactPage() {
   const details = [

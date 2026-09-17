@@ -1,10 +1,18 @@
 "use client";
 
-import { createFood, deleteFood, listFoods, toggleFoodActive, updateFood, type FoodRecord } from "@/app/actions/food";
+import {
+  createBlog,
+  deleteBlog,
+  listBlogs,
+  toggleBlogActive,
+  updateBlog,
+  type BlogRecord,
+} from "@/app/actions/blogs";
 import AdminImage from "@/components/admin/AdminImage";
 import AdminPagination from "@/components/admin/AdminPagination";
 import ConfirmDialog from "@/components/admin/ConfirmDialog";
 import ImageDropzone from "@/components/admin/ImageDropzone";
+import SeoFields from "@/components/admin/SeoFields";
 import {
   DeleteIcon,
   EditIcon,
@@ -24,50 +32,49 @@ import {
 } from "@/components/admin/adminStyles";
 import { usePagination } from "@/components/admin/usePagination";
 import { useToast } from "@/components/Toast";
-import { adminFoodCategories } from "@/data/food";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FormEvent, useMemo, useState } from "react";
 
-export default function FoodManager() {
+export default function BlogManager() {
   const toast = useToast();
   const queryClient = useQueryClient();
-  const foods = useQuery({ queryKey: ["foods"], queryFn: listFoods });
-  const [editing, setEditing] = useState<FoodRecord | null>(null);
+  const blogs = useQuery({ queryKey: ["blogs"], queryFn: listBlogs });
+  const [editing, setEditing] = useState<BlogRecord | null>(null);
   const [open, setOpen] = useState(false);
   const [error, setError] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("All");
-  const [deleteTarget, setDeleteTarget] = useState<FoodRecord | null>(null);
-  const [viewing, setViewing] = useState<FoodRecord | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<BlogRecord | null>(null);
+  const [viewing, setViewing] = useState<BlogRecord | null>(null);
+  const [titleForSlug, setTitleForSlug] = useState("");
 
   const rows = useMemo(() => {
-    return (foods.data ?? []).filter((item) => {
-      const matchesCategory = category === "All" || item.category === category;
-      const q = search.trim().toLowerCase();
-      const matchesSearch =
+    const q = search.trim().toLowerCase();
+    return (blogs.data ?? []).filter(
+      (item) =>
         !q ||
-        item.name.toLowerCase().includes(q) ||
-        item.description.toLowerCase().includes(q);
-      return matchesCategory && matchesSearch;
-    });
-  }, [foods.data, category, search]);
+        item.title.toLowerCase().includes(q) ||
+        item.excerpt.toLowerCase().includes(q) ||
+        item.slug.toLowerCase().includes(q) ||
+        item.metaKeywords.toLowerCase().includes(q),
+    );
+  }, [blogs.data, search]);
 
   const pagination = usePagination(rows);
 
   const save = useMutation({
     mutationFn: async (formData: FormData) => {
-      if (editing) await updateFood(editing.id, formData);
-      else await createFood(formData);
+      if (editing) await updateBlog(editing.id, formData);
+      else await createBlog(formData);
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["foods"] });
-      await queryClient.invalidateQueries({ queryKey: ["published-foods"] });
+      await queryClient.invalidateQueries({ queryKey: ["blogs"] });
+      await queryClient.invalidateQueries({ queryKey: ["published-blogs"] });
       setOpen(false);
       setEditing(null);
       setImageFile(null);
       setError("");
-      toast.success(editing ? "Dish updated" : "Dish added");
+      toast.success(editing ? "Blog updated" : "Blog added");
     },
     onError: (err: Error) => {
       setError(err.message);
@@ -76,23 +83,23 @@ export default function FoodManager() {
   });
 
   const remove = useMutation({
-    mutationFn: deleteFood,
+    mutationFn: deleteBlog,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["foods"] });
-      await queryClient.invalidateQueries({ queryKey: ["published-foods"] });
+      await queryClient.invalidateQueries({ queryKey: ["blogs"] });
+      await queryClient.invalidateQueries({ queryKey: ["published-blogs"] });
       setDeleteTarget(null);
-      toast.success("Dish deleted");
+      toast.success("Blog deleted");
     },
     onError: (err: Error) => toast.error(err.message),
   });
 
   const toggleActive = useMutation({
     mutationFn: ({ id, isActive }: { id: string; isActive: boolean }) =>
-      toggleFoodActive(id, isActive),
+      toggleBlogActive(id, isActive),
     onSuccess: async (_data, vars) => {
-      await queryClient.invalidateQueries({ queryKey: ["foods"] });
-      await queryClient.invalidateQueries({ queryKey: ["published-foods"] });
-      toast.success(vars.isActive ? "Dish set to Active" : "Dish set to Inactive");
+      await queryClient.invalidateQueries({ queryKey: ["blogs"] });
+      await queryClient.invalidateQueries({ queryKey: ["published-blogs"] });
+      toast.success(vars.isActive ? "Blog set to Active" : "Blog set to Inactive");
     },
     onError: (err: Error) => toast.error(err.message),
   });
@@ -106,13 +113,9 @@ export default function FoodManager() {
 
     const uploaded = formData.get("image");
     const hasFile = uploaded instanceof File && uploaded.size > 0;
-    console.log("[food submit]", {
-      fromState: imageFile ? { name: imageFile.name, size: imageFile.size } : null,
-      fromForm: uploaded instanceof File ? { name: uploaded.name, size: uploaded.size } : uploaded,
-    });
 
     if (!editing && !hasFile) {
-      setError("Image is required");
+      setError("Cover image is required");
       return;
     }
 
@@ -121,26 +124,8 @@ export default function FoodManager() {
 
   return (
     <section className="space-y-5">
-      <div className={`${adminPanel} grid gap-4 p-4 sm:grid-cols-2`}>
-        <label className="block">
-          <span className="mb-1.5 block text-xs font-medium text-zinc-400">Category</span>
-          <select
-            value={category}
-            onChange={(e) => {
-              setCategory(e.target.value);
-              pagination.resetPage();
-            }}
-            className={adminField}
-          >
-            <option value="All">All</option>
-            {adminFoodCategories.map((item) => (
-              <option key={item} value={item}>
-                {item}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="block">
+      <div className={`${adminPanel} p-4`}>
+        <label className="block max-w-md">
           <span className="mb-1.5 block text-xs font-medium text-zinc-400">Search</span>
           <input
             value={search}
@@ -148,7 +133,7 @@ export default function FoodManager() {
               setSearch(e.target.value);
               pagination.resetPage();
             }}
-            placeholder="Search keyword"
+            placeholder="Search title, slug, or keywords"
             className={adminField}
           />
         </label>
@@ -156,29 +141,30 @@ export default function FoodManager() {
 
       <div className={`${adminPanel} overflow-hidden`}>
         <div className="flex items-center justify-between gap-3 px-5 py-4">
-          <h1 className="text-base font-semibold text-white">All dishes</h1>
+          <h1 className="text-base font-semibold text-white">All blogs</h1>
           <button
             type="button"
             className={adminBtn}
             onClick={() => {
               setEditing(null);
+              setTitleForSlug("");
               setImageFile(null);
               setOpen(true);
               setError("");
             }}
           >
-            Add food
+            Add blog
           </button>
         </div>
 
-        {foods.isPending ? <p className="px-5 pb-5 text-sm text-zinc-500">Loading...</p> : null}
-        {foods.error ? (
+        {blogs.isPending ? <p className="px-5 pb-5 text-sm text-zinc-500">Loading...</p> : null}
+        {blogs.error ? (
           <p className="px-5 pb-5 text-sm font-semibold text-terracotta">
-            {(foods.error as Error).message}
+            {(blogs.error as Error).message}
           </p>
         ) : null}
-        {!foods.isPending && !rows.length ? (
-          <p className="px-5 pb-5 text-sm text-zinc-500">No dishes yet. Add the first food item.</p>
+        {!blogs.isPending && !rows.length ? (
+          <p className="px-5 pb-5 text-sm text-zinc-500">No blogs yet. Add the first post.</p>
         ) : null}
 
         {rows.length ? (
@@ -187,9 +173,8 @@ export default function FoodManager() {
               <table className="min-w-full text-left text-sm">
                 <thead className={adminTableHead}>
                   <tr>
-                    <th className="px-5 py-3 font-medium">Dish</th>
-                    <th className="px-5 py-3 font-medium">Category</th>
-                    <th className="hidden px-5 py-3 font-medium md:table-cell">Description</th>
+                    <th className="px-5 py-3 font-medium">Blog</th>
+                    <th className="hidden px-5 py-3 font-medium md:table-cell">Excerpt</th>
                     <th className="px-5 py-3 font-medium">Status</th>
                     <th className="px-5 py-3 text-right font-medium">Actions</th>
                   </tr>
@@ -201,15 +186,17 @@ export default function FoodManager() {
                         <div className="flex items-center gap-3">
                           <AdminImage
                             src={item.image}
-                            alt={item.name}
+                            alt={item.title}
                             className="h-10 w-10 shrink-0 rounded-full object-cover ring-1 ring-white/10"
                           />
-                          <span className="font-medium text-white">{item.name}</span>
+                          <div className="min-w-0">
+                            <span className="font-medium text-white">{item.title}</span>
+                            <p className="truncate text-xs text-zinc-500">/{item.slug}</p>
+                          </div>
                         </div>
                       </td>
-                      <td className="px-5 py-3 text-zinc-400">{item.category}</td>
-                      <td className="hidden max-w-xs truncate px-5 py-3 text-zinc-500 md:table-cell">
-                        {item.description}
+                      <td className="hidden max-w-md truncate px-5 py-3 text-zinc-500 md:table-cell">
+                        {item.excerpt}
                       </td>
                       <td className="px-5 py-3">
                         <button
@@ -232,7 +219,7 @@ export default function FoodManager() {
                           <button
                             type="button"
                             title="View"
-                            aria-label={`View ${item.name}`}
+                            aria-label={`View ${item.title}`}
                             className={adminIconBtn}
                             onClick={() => setViewing(item)}
                           >
@@ -241,10 +228,11 @@ export default function FoodManager() {
                           <button
                             type="button"
                             title="Edit"
-                            aria-label={`Edit ${item.name}`}
+                            aria-label={`Edit ${item.title}`}
                             className={adminIconBtn}
                             onClick={() => {
                               setEditing(item);
+                              setTitleForSlug(item.title);
                               setImageFile(null);
                               setOpen(true);
                               setError("");
@@ -255,7 +243,7 @@ export default function FoodManager() {
                           <button
                             type="button"
                             title="Delete"
-                            aria-label={`Delete ${item.name}`}
+                            aria-label={`Delete ${item.title}`}
                             className={`${adminIconBtn} hover:border-red-500/30 hover:text-red-400`}
                             onClick={() => setDeleteTarget(item)}
                           >
@@ -286,45 +274,56 @@ export default function FoodManager() {
         <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/70 p-4">
           <form
             onSubmit={onSubmit}
-            className="scrollbar-admin max-h-[90vh] w-full max-w-lg space-y-3 overflow-y-auto rounded-2xl bg-[#141414] p-6 ring-1 ring-white/10"
+            className="scrollbar-admin max-h-[90vh] w-full max-w-2xl space-y-3 overflow-y-auto rounded-2xl bg-[#141414] p-6 ring-1 ring-white/10"
           >
             <h2 className="text-xl font-semibold text-white">
-              {editing ? "Edit food" : "Add food"}
+              {editing ? "Edit blog" : "Add blog"}
             </h2>
             <input
-              name="name"
+              name="title"
               required
-              defaultValue={editing?.name}
-              placeholder="Name"
+              value={titleForSlug}
+              onChange={(e) => setTitleForSlug(e.target.value)}
+              placeholder="Title"
               className={adminField}
             />
-            <select
-              name="category"
-              required
-              defaultValue={editing?.category ?? adminFoodCategories[0]}
-              className={adminField}
-            >
-              {adminFoodCategories.map((item) => (
-                <option key={item} value={item}>
-                  {item}
-                </option>
-              ))}
-            </select>
             <textarea
-              name="description"
+              name="excerpt"
               required
-              defaultValue={editing?.description}
-              placeholder="Description"
-              rows={4}
+              defaultValue={editing?.excerpt}
+              placeholder="Short excerpt"
+              rows={2}
+              className={adminField}
+            />
+            <textarea
+              name="content"
+              required
+              defaultValue={editing?.content}
+              placeholder="Full blog content"
+              rows={8}
               className={adminField}
             />
             <ImageDropzone
               key={editing?.id ?? "new"}
-              label="Dish image (ImageKit)"
+              label="Cover image (ImageKit)"
               required={!editing}
               existingImage={editing?.image}
               maxBytes={5_000_000}
               onFileSelect={setImageFile}
+            />
+            <SeoFields
+              formKey={editing?.id ?? "new-blog"}
+              sourceTitle={titleForSlug}
+              defaults={
+                editing
+                  ? {
+                      slug: editing.slug,
+                      metaTitle: editing.metaTitle,
+                      metaDescription: editing.metaDescription,
+                      metaKeywords: editing.metaKeywords,
+                    }
+                  : undefined
+              }
             />
             <label className="flex items-center gap-2 text-sm text-zinc-300">
               <input
@@ -354,38 +353,54 @@ export default function FoodManager() {
           onClick={() => setViewing(null)}
         >
           <div
-            className="scrollbar-admin max-h-[90vh] w-full max-w-lg space-y-4 overflow-y-auto rounded-2xl bg-[#141414] p-6 ring-1 ring-white/10"
+            className="scrollbar-admin max-h-[90vh] w-full max-w-2xl space-y-4 overflow-y-auto rounded-2xl bg-[#141414] p-6 ring-1 ring-white/10"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-start justify-between gap-3">
-              <h2 className="text-xl font-semibold text-white">{viewing.name}</h2>
+              <h2 className="text-xl font-semibold text-white">{viewing.title}</h2>
               <button type="button" onClick={() => setViewing(null)} className={adminGhost}>
                 Close
               </button>
             </div>
             <AdminImage
               src={viewing.image}
-              alt={viewing.name}
+              alt={viewing.title}
               className="h-48 w-full rounded-xl object-cover ring-1 ring-white/10"
             />
-            <dl className="space-y-3 text-sm">
+            <div>
+              <p className="text-xs uppercase tracking-wide text-zinc-500">Status</p>
+              <p className="mt-1">
+                <span className={viewing.isActive ? adminBadge : adminBadgeMuted}>
+                  {viewing.isActive ? "Active" : "Inactive"}
+                </span>
+              </p>
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-wide text-zinc-500">Excerpt</p>
+              <p className="mt-1 text-sm text-zinc-300">{viewing.excerpt}</p>
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-wide text-zinc-500">Content</p>
+              <p className="mt-1 whitespace-pre-wrap text-sm text-zinc-300">{viewing.content}</p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
               <div>
-                <dt className="text-xs uppercase tracking-wide text-zinc-500">Category</dt>
-                <dd className="mt-1 text-zinc-200">{viewing.category}</dd>
+                <p className="text-xs uppercase tracking-wide text-zinc-500">Slug</p>
+                <p className="mt-1 text-sm text-zinc-300">/{viewing.slug}</p>
               </div>
               <div>
-                <dt className="text-xs uppercase tracking-wide text-zinc-500">Status</dt>
-                <dd className="mt-1">
-                  <span className={viewing.isActive ? adminBadge : adminBadgeMuted}>
-                    {viewing.isActive ? "Active" : "Inactive"}
-                  </span>
-                </dd>
+                <p className="text-xs uppercase tracking-wide text-zinc-500">Meta title</p>
+                <p className="mt-1 text-sm text-zinc-300">{viewing.metaTitle || "—"}</p>
               </div>
-              <div>
-                <dt className="text-xs uppercase tracking-wide text-zinc-500">Description</dt>
-                <dd className="mt-1 text-zinc-300">{viewing.description}</dd>
+              <div className="sm:col-span-2">
+                <p className="text-xs uppercase tracking-wide text-zinc-500">Meta description</p>
+                <p className="mt-1 text-sm text-zinc-300">{viewing.metaDescription || "—"}</p>
               </div>
-            </dl>
+              <div className="sm:col-span-2">
+                <p className="text-xs uppercase tracking-wide text-zinc-500">Keywords</p>
+                <p className="mt-1 text-sm text-zinc-300">{viewing.metaKeywords || "—"}</p>
+              </div>
+            </div>
             <div className="flex justify-end gap-2">
               <button
                 type="button"
@@ -393,6 +408,7 @@ export default function FoodManager() {
                 className={adminIconBtn}
                 onClick={() => {
                   setEditing(viewing);
+                  setTitleForSlug(viewing.title);
                   setImageFile(null);
                   setViewing(null);
                   setOpen(true);
@@ -419,7 +435,7 @@ export default function FoodManager() {
         title="Are you sure to delete?"
         message={
           deleteTarget
-            ? `This will permanently delete “${deleteTarget.name}”. This action cannot be undone.`
+            ? `This will permanently delete “${deleteTarget.title}”. This action cannot be undone.`
             : ""
         }
         confirmLabel="Delete"

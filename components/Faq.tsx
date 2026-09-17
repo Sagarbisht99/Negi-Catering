@@ -14,13 +14,17 @@ export default function Faq() {
     <section
       id="faq"
       className="border-y border-line bg-ivory-deep/40 py-10 md:py-16"
+      aria-labelledby="faq-heading"
     >
       <div className="mx-auto max-w-7xl px-3 sm:px-4 md:px-6">
         <div className="mb-8 text-center">
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-terracotta">
             Help Centre
           </p>
-          <h2 className="mt-2 font-display text-2xl font-semibold text-ink sm:text-3xl md:text-4xl">
+          <h2
+            id="faq-heading"
+            className="mt-2 font-display text-2xl font-semibold text-ink sm:text-3xl md:text-4xl"
+          >
             Frequently asked questions
           </h2>
           <p className="mt-2 text-sm text-muted md:text-base">
@@ -42,6 +46,8 @@ export default function Faq() {
                     <button
                       type="button"
                       aria-expanded={open}
+                      aria-controls={`faq-panel-${index}`}
+                      id={`faq-button-${index}`}
                       onClick={() => setOpenIndex(open ? null : index)}
                       className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left"
                     >
@@ -58,13 +64,15 @@ export default function Faq() {
                         {open ? "−" : "+"}
                       </span>
                     </button>
-                    {open ? (
-                      <div className="border-t border-line px-5 py-4">
-                        <p className="text-sm leading-relaxed text-muted">
-                          {item.answer}
-                        </p>
-                      </div>
-                    ) : null}
+                    <div
+                      id={`faq-panel-${index}`}
+                      role="region"
+                      aria-labelledby={`faq-button-${index}`}
+                      hidden={!open}
+                      className={open ? "border-t border-line px-5 py-4" : "sr-only"}
+                    >
+                      <p className="text-sm leading-relaxed text-muted">{item.answer}</p>
+                    </div>
                   </div>
                 );
               })}

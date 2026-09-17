@@ -3,8 +3,8 @@ import ImageKit, { toFile } from "@imagekit/nodejs";
 const DEFAULT_MAX_BYTES = 5_000_000;
 
 const FOLDERS = {
-  food: "/negi-catering/food",
   services: "/negi-catering/services",
+  blogs: "/negi-catering/blogs",
   offers: "/negi-catering/offers",
 } as const;
 

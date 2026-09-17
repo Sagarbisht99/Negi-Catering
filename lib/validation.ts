@@ -1,5 +1,4 @@
 import { enquiryStatuses } from "@/data/enquiry";
-import { adminFoodCategories } from "@/data/food";
 import { occasions } from "@/data/occasions";
 import { z } from "zod";
 
@@ -57,27 +56,35 @@ export const enquiryAdminSchema = z.object({
 
 export type EnquiryAdminValues = z.infer<typeof enquiryAdminSchema>;
 
-export const foodFieldsSchema = z.object({
-  name: z
+const slugFieldSchema = z
+  .string()
+  .trim()
+  .max(80, "Slug is too long")
+  .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$|^$/, {
+    message: "Slug can only use lowercase letters, numbers, and hyphens",
+  });
+
+const seoFieldsSchema = {
+  slug: slugFieldSchema,
+  metaTitle: z.string().trim().max(70, "Meta title is too long (max 70)"),
+  metaDescription: z
     .string()
     .trim()
-    .min(2, "Food name is required")
-    .max(100, "Food name is too long"),
-  category: z
+    .max(160, "Meta description is too long (max 160)"),
+  metaKeywords: z
     .string()
     .trim()
+    .max(300, "Keywords are too long")
     .refine(
-      (value): value is (typeof adminFoodCategories)[number] =>
-        (adminFoodCategories as readonly string[]).includes(value),
-      { message: "Choose a valid category" },
+      (value) =>
+        !value ||
+        value
+          .split(",")
+          .map((k) => k.trim())
+          .filter(Boolean).length <= 15,
+      { message: "Use up to 15 comma-separated keywords" },
     ),
-  description: z
-    .string()
-    .trim()
-    .min(5, "Description is required")
-    .max(1000, "Description is too long"),
-  isActive: z.boolean(),
-});
+};
 
 export const serviceFieldsSchema = z.object({
   name: z
@@ -91,6 +98,27 @@ export const serviceFieldsSchema = z.object({
     .min(5, "Description is required")
     .max(1000, "Description is too long"),
   isActive: z.boolean(),
+  ...seoFieldsSchema,
+});
+
+export const blogFieldsSchema = z.object({
+  title: z
+    .string()
+    .trim()
+    .min(3, "Blog title is required")
+    .max(140, "Blog title is too long"),
+  excerpt: z
+    .string()
+    .trim()
+    .min(10, "Excerpt is required")
+    .max(300, "Excerpt is too long"),
+  content: z
+    .string()
+    .trim()
+    .min(20, "Content is required")
+    .max(20000, "Content is too long"),
+  isActive: z.boolean(),
+  ...seoFieldsSchema,
 });
 
 export const offerFieldsSchema = z.object({

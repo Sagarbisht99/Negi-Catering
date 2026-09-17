@@ -11,7 +11,6 @@ import { useEffect, useRef, useState } from "react";
 
 const nav = [
   { label: "About Us", href: "/about" },
-  { label: "Gallery", href: "/gallery" },
   { label: "FAQ", href: "/#faq" },
   { label: "Contact Us", href: "/contact" },
 ];
@@ -58,7 +57,7 @@ export default function Header() {
     return pathname === href;
   };
 
-  const servicesActive = pathname === "/services";
+  const servicesActive = pathname === "/services" || pathname.startsWith("/services/");
 
   const linkClass = (active: boolean) =>
     [
