@@ -29,7 +29,7 @@ export const site = {
     phone: "+919315113011",
     /** Display format */
     phoneDisplay: "+91 93151 13011",
-    email: "Pratyaksh25negi@gmail.com",
+    email: "contact@negicaterer.in",
     hours: "Mon–Sun · 9:00 AM – 9:00 PM",
     openingHoursSpec: "Mo-Su 09:00-21:00",
   },
