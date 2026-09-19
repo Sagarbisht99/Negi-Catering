@@ -21,6 +21,7 @@ export type BlogRecord = {
   metaDescription: string;
   metaKeywords: string;
   isActive: boolean;
+  sortOrder: number;
   createdAt?: string;
   updatedAt?: string;
 };
@@ -49,6 +50,7 @@ function normalizeBlog(row: BlogRecord): BlogRecord {
     metaDescription: row.metaDescription ?? "",
     metaKeywords: row.metaKeywords ?? "",
     isActive: isActiveValue(row.isActive),
+    sortOrder: Number.isFinite(row.sortOrder) ? row.sortOrder : 100,
   };
 }
 
@@ -74,7 +76,10 @@ export async function listPublishedBlogs(limit?: number): Promise<BlogRecord[]> 
   try {
     if (!process.env.MONGODB_URI) return [];
     await dbConnect();
-    let query = Blog.find({ isActive: { $ne: false } }).sort({ createdAt: -1 });
+    let query = Blog.find({ isActive: { $ne: false } }).sort({
+      sortOrder: 1,
+      createdAt: -1,
+    });
     if (limit && limit > 0) query = query.limit(limit);
     const rows = await query.lean();
     return rows.map((row) => normalizeBlog(serializeDoc<BlogRecord>(row)));
@@ -100,8 +105,30 @@ export async function getPublishedBlogBySlug(
 export async function listBlogs(): Promise<BlogRecord[]> {
   await requireAdmin();
   await dbConnect();
-  const rows = await Blog.find().sort({ createdAt: -1 }).lean();
+  const rows = await Blog.find().sort({ sortOrder: 1, createdAt: -1 }).lean();
   return rows.map((row) => normalizeBlog(serializeDoc<BlogRecord>(row)));
+}
+
+/** Move a blog up/down — website list updates after revalidate. */
+export async function moveBlog(id: string, direction: "up" | "down") {
+  await requireAdmin();
+  await dbConnect();
+
+  const rows = await Blog.find().sort({ sortOrder: 1, createdAt: -1 }).lean();
+  const index = rows.findIndex((row) => String(row._id) === id);
+  if (index < 0) throw new Error("Blog not found");
+
+  const swapWith = direction === "up" ? index - 1 : index + 1;
+  if (swapWith < 0 || swapWith >= rows.length) return;
+
+  const ordered = [...rows];
+  [ordered[index], ordered[swapWith]] = [ordered[swapWith], ordered[index]];
+
+  await Promise.all(
+    ordered.map((row, i) => Blog.findByIdAndUpdate(row._id, { sortOrder: i })),
+  );
+
+  refreshBlogPages();
 }
 
 export async function toggleBlogActive(id: string, isActive: boolean) {
@@ -121,12 +148,16 @@ export async function createBlog(formData: FormData) {
 
   await dbConnect();
   await assertUniqueBlogSlug(slug);
+  const last = await Blog.findOne().sort({ sortOrder: -1 }).select("sortOrder").lean();
+  const nextOrder =
+    typeof last?.sortOrder === "number" ? last.sortOrder + 1 : (await Blog.countDocuments());
   await Blog.create({
     ...fields,
     slug,
     image: url,
     fileId,
     isActive: fields.isActive,
+    sortOrder: nextOrder,
   });
   refreshBlogPages(slug);
 }

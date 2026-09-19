@@ -86,8 +86,8 @@ export default function AboutPage() {
       <section className="mx-auto grid max-w-7xl items-stretch gap-8 px-3 py-10 sm:px-4 md:grid-cols-2 md:gap-10 md:px-6 md:py-20">
         <div className="relative min-h-[280px] overflow-hidden rounded-[28px] shadow-sm ring-1 ring-line md:min-h-0">
           <Image
-            src="/images/about-feast.png"
-            alt="Indian catering feast with curries, rice, naan and tandoori"
+            src="https://i.pinimg.com/736x/9e/bd/72/9ebd72780bda88630eec535570c11f04.jpg"
+            alt="Traditional Indian thali feast from Negi Caterers"
             fill
             quality={90}
             className="object-cover"
@@ -102,7 +102,7 @@ export default function AboutPage() {
             Our Story
           </h2>
           <p className="mt-4 text-sm leading-relaxed text-muted md:text-base">
-            What started as a family kitchen in {site.brand.since} has grown into
+            we started as a family kitchen in {site.brand.since} has grown into
             a trusted catering and tiffin service across {site.location.label}. We
             still cook the way our elders taught us — fresh ingredients, patient
             tempering, and menus that feel like home.

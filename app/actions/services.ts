@@ -20,6 +20,7 @@ export type ServiceRecord = {
   metaDescription: string;
   metaKeywords: string;
   isActive: boolean;
+  sortOrder: number;
 };
 
 function isActiveValue(value: unknown) {
@@ -46,8 +47,11 @@ function normalizeService(row: ServiceRecord): ServiceRecord {
     metaDescription: row.metaDescription ?? "",
     metaKeywords: row.metaKeywords ?? "",
     isActive: isActiveValue(row.isActive),
+    sortOrder: typeof row.sortOrder === "number" ? row.sortOrder : 100,
   };
 }
+
+const serviceListSort = { sortOrder: 1 as const, createdAt: -1 as const };
 
 async function assertUniqueServiceSlug(slug: string, excludeId?: string) {
   const query = excludeId
@@ -73,7 +77,7 @@ export async function listPublishedServices(
   try {
     if (!process.env.MONGODB_URI) return [];
     await dbConnect();
-    let query = Service.find({ isActive: { $ne: false } }).sort({ createdAt: -1 });
+    let query = Service.find({ isActive: { $ne: false } }).sort(serviceListSort);
     if (limit && limit > 0) query = query.limit(limit);
     const rows = await query.lean();
     return rows.map((row) => normalizeService(serializeDoc<ServiceRecord>(row)));
@@ -106,8 +110,30 @@ export async function getPublishedServiceBySlug(
 export async function listServices(): Promise<ServiceRecord[]> {
   await requireAdmin();
   await dbConnect();
-  const rows = await Service.find().sort({ createdAt: -1 }).lean();
+  const rows = await Service.find().sort(serviceListSort).lean();
   return rows.map((row) => normalizeService(serializeDoc<ServiceRecord>(row)));
+}
+
+/** Move a service up/down — website list updates immediately after revalidate. */
+export async function moveService(id: string, direction: "up" | "down") {
+  await requireAdmin();
+  await dbConnect();
+
+  const rows = await Service.find().sort(serviceListSort).lean();
+  const index = rows.findIndex((row) => String(row._id) === id);
+  if (index < 0) throw new Error("Service not found");
+
+  const swapWith = direction === "up" ? index - 1 : index + 1;
+  if (swapWith < 0 || swapWith >= rows.length) return;
+
+  const ordered = [...rows];
+  [ordered[index], ordered[swapWith]] = [ordered[swapWith], ordered[index]];
+
+  await Promise.all(
+    ordered.map((row, i) => Service.findByIdAndUpdate(row._id, { sortOrder: i })),
+  );
+
+  refreshServicePages();
 }
 
 export async function toggleServiceActive(id: string, isActive: boolean) {
@@ -127,12 +153,16 @@ export async function createService(formData: FormData) {
 
   await dbConnect();
   await assertUniqueServiceSlug(slug);
+  const last = await Service.findOne().sort({ sortOrder: -1 }).select("sortOrder").lean();
+  const nextOrder =
+    typeof last?.sortOrder === "number" ? last.sortOrder + 1 : (await Service.countDocuments());
   await Service.create({
     ...fields,
     slug,
     image: url,
     fileId,
     isActive: fields.isActive,
+    sortOrder: nextOrder,
   });
   refreshServicePages(slug);
 }
