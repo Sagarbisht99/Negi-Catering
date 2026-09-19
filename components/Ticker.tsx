@@ -5,7 +5,7 @@ export default function Ticker() {
     "500+ Menu Options",
     `Trusted ${site.brand.sinceLabel}`,
     "Homestyle Tiffin & Catering",
-    "Weddings · Parties · Offices",
+    "Parties · Offices · Festivals",
     `Serving ${site.location.label}`,
   ];
   const loop = [...items, ...items];

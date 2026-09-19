@@ -4,7 +4,6 @@ export const occasions = [
   "Corporate Parties",
   "Anniversary",
   "Pooja",
-  "Wedding",
   "Festival",
 ] as const;
 

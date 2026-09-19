@@ -39,7 +39,7 @@ export default function OurStory() {
           </h2>
           <p className="mt-4 text-sm leading-relaxed text-muted md:text-base">
             {site.brand.description} Across {site.location.label}, we cook with
-            the same care whether it&apos;s daily tiffin or a wedding feast.
+            the same care whether it&apos;s daily tiffin or a festive feast.
           </p>
           <p className="mt-3 text-sm leading-relaxed text-muted md:text-base">
             From intimate house parties to office lunches and festive gatherings,

@@ -12,7 +12,7 @@ export const faqItems: FaqItem[] = [
   {
     question: "How early should I book?",
     answer:
-      "For house parties and office meals, 2–3 days is usually enough. For weddings, festivals, and large buffets, book at least 1–2 weeks ahead so we can lock the menu and team.",
+      "For house parties and office meals, 2–3 days is usually enough. For festivals and large buffets, book at least 1–2 weeks ahead so we can lock the menu and team.",
   },
   {
     question: "Do you offer pure veg and Jain menus?",
@@ -27,7 +27,7 @@ export const faqItems: FaqItem[] = [
   {
     question: "Do you provide staff, crockery, and setup?",
     answer:
-      "Depending on the package — buffet and wedding feasts can include service staff and presentation support. Tiffin and tray deliveries are usually drop-off only.",
+      "Depending on the package — buffet and larger feasts can include service staff and presentation support. Tiffin and tray deliveries are usually drop-off only.",
   },
   {
     question: "How do quotes and payments work?",

@@ -91,7 +91,9 @@ export const metadata: Metadata = {
   },
   other: {
     "geo.region": "IN-DL",
-    "geo.placename": site.location.label,
+    "geo.placename": site.location.addressLocality,
+    "geo.position": `${site.location.lat};${site.location.lng}`,
+    ICBM: `${site.location.lat}, ${site.location.lng}`,
   },
 };
 

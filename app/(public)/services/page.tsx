@@ -11,9 +11,9 @@ import Link from "next/link";
 export const revalidate = 300;
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Services",
-  description: `Explore catering services from ${site.brand.name} — daily tiffin, buffet, live counters, office meals, wedding feasts, and pooja prasad across ${site.location.label}.`,
-  keywords: `catering services, tiffin, wedding buffet, office meals, ${site.location.label}, ${site.brand.name}`,
+  title: "Catering Services in Delhi NCR",
+  description: `Explore catering services from ${site.brand.name} in New Ashok Nagar — daily tiffin, buffet, live counters, office meals, and pooja prasad across ${site.location.label}.`,
+  keywords: `catering services Delhi NCR, tiffin service New Ashok Nagar, buffet catering Delhi, office meals East Delhi, pooja prasad catering, ${site.brand.name}`,
   path: "/services",
 });
 
@@ -47,7 +47,7 @@ export default async function ServicesPage() {
             Catering for every occasion
           </h1>
           <p className="mt-4 max-w-xl text-sm leading-relaxed text-white/90 md:text-lg">
-            From daily tiffin to wedding feasts — choose a service that fits your
+            From daily tiffin to festive feasts — choose a service that fits your
             guest count, venue, and style.
           </p>
         </div>

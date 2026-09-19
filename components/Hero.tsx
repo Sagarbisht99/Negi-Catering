@@ -41,7 +41,7 @@ export default function Hero() {
         {site.brand.fullName} — catering and tiffin services in {site.location.label} since{" "}
         {site.brand.since}
       </h1>
-      <div className="relative mx-auto min-h-[220px] aspect-[4/3] max-w-7xl overflow-hidden rounded-[16px] bg-card shadow-sm ring-1 ring-line sm:min-h-0 sm:aspect-[16/9] sm:rounded-[20px] md:aspect-[1024/504] md:rounded-[32px]">
+      <div className="relative mx-auto aspect-[1024/504] w-full max-w-7xl overflow-hidden rounded-[16px] bg-card shadow-sm ring-1 ring-line sm:rounded-[20px] md:rounded-[32px]">
         {slides.map((slide, i) => {
           const active = i === index;
           const nearby = Math.abs(i - index) <= 1 || (index === 0 && i === slides.length - 1);
@@ -60,8 +60,8 @@ export default function Hero() {
                 alt={slide.alt}
                 fill
                 priority={i === 0}
-                quality={75}
-                className="object-cover object-center sm:object-contain"
+                quality={85}
+                className="object-contain object-center"
                 sizes="(max-width: 768px) 100vw, min(1280px, 100vw)"
               />
             </div>

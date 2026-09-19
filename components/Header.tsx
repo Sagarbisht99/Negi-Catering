@@ -95,10 +95,10 @@ export default function Header() {
           />
           <span className="-ml-0.5 flex min-w-0 flex-col leading-none">
             <span className="font-display text-base font-semibold tracking-tight text-ink sm:text-xl md:text-2xl">
-              {site.brand.shortName}
+              Negi
             </span>
-            <span className="text-[9px] font-semibold uppercase tracking-[0.12em] text-terracotta sm:text-[10px] sm:tracking-[0.14em]">
-              {site.brand.tagline}
+            <span className="text-[9px] font-semibold uppercase tracking-[0.12em] text-ink sm:text-[10px] sm:tracking-[0.14em]">
+              Caterers &amp; Tiffin
             </span>
           </span>
         </Link>
