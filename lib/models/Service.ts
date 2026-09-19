@@ -11,6 +11,8 @@ const ServiceSchema = new Schema(
     metaDescription: { type: String, trim: true, default: "" },
     metaKeywords: { type: String, trim: true, default: "" },
     isActive: { type: Boolean, default: true },
+    /** Lower number shows first on the website */
+    sortOrder: { type: Number, default: 100, index: true },
   },
   { timestamps: true },
 );
@@ -31,4 +33,7 @@ if (!Service.schema.path("metaTitle")) {
     metaDescription: { type: String, trim: true, default: "" },
     metaKeywords: { type: String, trim: true, default: "" },
   });
+}
+if (!Service.schema.path("sortOrder")) {
+  Service.schema.add({ sortOrder: { type: Number, default: 100, index: true } });
 }

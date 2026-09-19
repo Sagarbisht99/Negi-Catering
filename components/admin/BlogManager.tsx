@@ -4,6 +4,7 @@ import {
   createBlog,
   deleteBlog,
   listBlogs,
+  moveBlog,
   toggleBlogActive,
   updateBlog,
   type BlogRecord,
@@ -14,6 +15,8 @@ import ConfirmDialog from "@/components/admin/ConfirmDialog";
 import ImageDropzone from "@/components/admin/ImageDropzone";
 import SeoFields from "@/components/admin/SeoFields";
 import {
+  ChevronDownIcon,
+  ChevronUpIcon,
   DeleteIcon,
   EditIcon,
   ViewIcon,
@@ -61,6 +64,14 @@ export default function BlogManager() {
   }, [blogs.data, search]);
 
   const pagination = usePagination(rows);
+  const fullList = blogs.data ?? [];
+  const searching = Boolean(search.trim());
+
+  const invalidateLists = () =>
+    Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["blogs"] }),
+      queryClient.invalidateQueries({ queryKey: ["published-blogs"] }),
+    ]);
 
   const save = useMutation({
     mutationFn: async (formData: FormData) => {
@@ -68,8 +79,7 @@ export default function BlogManager() {
       else await createBlog(formData);
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["blogs"] });
-      await queryClient.invalidateQueries({ queryKey: ["published-blogs"] });
+      await invalidateLists();
       setOpen(false);
       setEditing(null);
       setImageFile(null);
@@ -85,8 +95,7 @@ export default function BlogManager() {
   const remove = useMutation({
     mutationFn: deleteBlog,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["blogs"] });
-      await queryClient.invalidateQueries({ queryKey: ["published-blogs"] });
+      await invalidateLists();
       setDeleteTarget(null);
       toast.success("Blog deleted");
     },
@@ -97,11 +106,39 @@ export default function BlogManager() {
     mutationFn: ({ id, isActive }: { id: string; isActive: boolean }) =>
       toggleBlogActive(id, isActive),
     onSuccess: async (_data, vars) => {
-      await queryClient.invalidateQueries({ queryKey: ["blogs"] });
-      await queryClient.invalidateQueries({ queryKey: ["published-blogs"] });
+      await invalidateLists();
       toast.success(vars.isActive ? "Blog set to Active" : "Blog set to Inactive");
     },
     onError: (err: Error) => toast.error(err.message),
+  });
+
+  const reorder = useMutation({
+    mutationFn: ({ id, direction }: { id: string; direction: "up" | "down" }) =>
+      moveBlog(id, direction),
+    onMutate: async ({ id, direction }) => {
+      await queryClient.cancelQueries({ queryKey: ["blogs"] });
+      const previous = queryClient.getQueryData<BlogRecord[]>(["blogs"]);
+      if (previous) {
+        const next = [...previous];
+        const index = next.findIndex((item) => item.id === id);
+        const swapWith = direction === "up" ? index - 1 : index + 1;
+        if (index >= 0 && swapWith >= 0 && swapWith < next.length) {
+          [next[index], next[swapWith]] = [next[swapWith], next[index]];
+          queryClient.setQueryData(["blogs"], next);
+        }
+      }
+      return { previous };
+    },
+    onError: (err: Error, _vars, ctx) => {
+      if (ctx?.previous) queryClient.setQueryData(["blogs"], ctx.previous);
+      toast.error(err.message);
+    },
+    onSuccess: () => {
+      toast.success("Order updated — live on site");
+    },
+    onSettled: async () => {
+      await invalidateLists();
+    },
   });
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
@@ -141,7 +178,13 @@ export default function BlogManager() {
 
       <div className={`${adminPanel} overflow-hidden`}>
         <div className="flex items-center justify-between gap-3 px-5 py-4">
-          <h1 className="text-base font-semibold text-white">All blogs</h1>
+          <div>
+            <h1 className="text-base font-semibold text-white">All blogs</h1>
+            <p className="mt-1 text-sm text-zinc-500">
+              Use ↑ ↓ to change website order instantly.
+              {searching ? " Clear search to reorder." : ""}
+            </p>
+          </div>
           <button
             type="button"
             className={adminBtn}
@@ -180,7 +223,12 @@ export default function BlogManager() {
                   </tr>
                 </thead>
                 <tbody>
-                  {pagination.pageItems.map((item) => (
+                  {pagination.pageItems.map((item) => {
+                    const fullIndex = fullList.findIndex((row) => row.id === item.id);
+                    const canUp = !searching && fullIndex > 0;
+                    const canDown = !searching && fullIndex >= 0 && fullIndex < fullList.length - 1;
+
+                    return (
                     <tr key={item.id} className={adminTableRow}>
                       <td className="px-5 py-3">
                         <div className="flex items-center gap-3">
@@ -218,6 +266,26 @@ export default function BlogManager() {
                         <div className="flex items-center justify-end gap-1.5">
                           <button
                             type="button"
+                            title="Move up"
+                            aria-label={`Move ${item.title} up`}
+                            disabled={!canUp || reorder.isPending}
+                            className={adminIconBtn}
+                            onClick={() => reorder.mutate({ id: item.id, direction: "up" })}
+                          >
+                            <ChevronUpIcon />
+                          </button>
+                          <button
+                            type="button"
+                            title="Move down"
+                            aria-label={`Move ${item.title} down`}
+                            disabled={!canDown || reorder.isPending}
+                            className={adminIconBtn}
+                            onClick={() => reorder.mutate({ id: item.id, direction: "down" })}
+                          >
+                            <ChevronDownIcon />
+                          </button>
+                          <button
+                            type="button"
                             title="View"
                             aria-label={`View ${item.title}`}
                             className={adminIconBtn}
@@ -252,7 +320,8 @@ export default function BlogManager() {
                         </div>
                       </td>
                     </tr>
-                  ))}
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

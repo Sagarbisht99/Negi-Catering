@@ -4,6 +4,7 @@ import {
   createService,
   deleteService,
   listServices,
+  moveService,
   toggleServiceActive,
   updateService,
   type ServiceRecord,
@@ -14,6 +15,8 @@ import ConfirmDialog from "@/components/admin/ConfirmDialog";
 import ImageDropzone from "@/components/admin/ImageDropzone";
 import SeoFields from "@/components/admin/SeoFields";
 import {
+  ChevronDownIcon,
+  ChevronUpIcon,
   DeleteIcon,
   EditIcon,
   ViewIcon,
@@ -61,6 +64,14 @@ export default function ServiceManager() {
   }, [services.data, search]);
 
   const pagination = usePagination(rows);
+  const fullList = services.data ?? [];
+  const searching = Boolean(search.trim());
+
+  const invalidateLists = () =>
+    Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["services"] }),
+      queryClient.invalidateQueries({ queryKey: ["published-services"] }),
+    ]);
 
   const save = useMutation({
     mutationFn: async (formData: FormData) => {
@@ -68,8 +79,7 @@ export default function ServiceManager() {
       else await createService(formData);
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["services"] });
-      await queryClient.invalidateQueries({ queryKey: ["published-services"] });
+      await invalidateLists();
       setOpen(false);
       setEditing(null);
       setImageFile(null);
@@ -85,8 +95,7 @@ export default function ServiceManager() {
   const remove = useMutation({
     mutationFn: deleteService,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["services"] });
-      await queryClient.invalidateQueries({ queryKey: ["published-services"] });
+      await invalidateLists();
       setDeleteTarget(null);
       toast.success("Service deleted");
     },
@@ -97,11 +106,39 @@ export default function ServiceManager() {
     mutationFn: ({ id, isActive }: { id: string; isActive: boolean }) =>
       toggleServiceActive(id, isActive),
     onSuccess: async (_data, vars) => {
-      await queryClient.invalidateQueries({ queryKey: ["services"] });
-      await queryClient.invalidateQueries({ queryKey: ["published-services"] });
+      await invalidateLists();
       toast.success(vars.isActive ? "Service set to Active" : "Service set to Inactive");
     },
     onError: (err: Error) => toast.error(err.message),
+  });
+
+  const reorder = useMutation({
+    mutationFn: ({ id, direction }: { id: string; direction: "up" | "down" }) =>
+      moveService(id, direction),
+    onMutate: async ({ id, direction }) => {
+      await queryClient.cancelQueries({ queryKey: ["services"] });
+      const previous = queryClient.getQueryData<ServiceRecord[]>(["services"]);
+      if (previous) {
+        const next = [...previous];
+        const index = next.findIndex((item) => item.id === id);
+        const swapWith = direction === "up" ? index - 1 : index + 1;
+        if (index >= 0 && swapWith >= 0 && swapWith < next.length) {
+          [next[index], next[swapWith]] = [next[swapWith], next[index]];
+          queryClient.setQueryData(["services"], next);
+        }
+      }
+      return { previous };
+    },
+    onError: (err: Error, _vars, ctx) => {
+      if (ctx?.previous) queryClient.setQueryData(["services"], ctx.previous);
+      toast.error(err.message);
+    },
+    onSuccess: () => {
+      toast.success("Order updated — live on site");
+    },
+    onSettled: async () => {
+      await invalidateLists();
+    },
   });
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
@@ -141,7 +178,13 @@ export default function ServiceManager() {
 
       <div className={`${adminPanel} overflow-hidden`}>
         <div className="flex items-center justify-between gap-3 px-5 py-4">
-          <h1 className="text-base font-semibold text-white">All services</h1>
+          <div>
+            <h1 className="text-base font-semibold text-white">All services</h1>
+            <p className="mt-1 text-sm text-zinc-500">
+              Use ↑ ↓ to change website order instantly.
+              {searching ? " Clear search to reorder." : ""}
+            </p>
+          </div>
           <button
             type="button"
             className={adminBtn}
@@ -180,7 +223,12 @@ export default function ServiceManager() {
                   </tr>
                 </thead>
                 <tbody>
-                  {pagination.pageItems.map((item) => (
+                  {pagination.pageItems.map((item) => {
+                    const fullIndex = fullList.findIndex((row) => row.id === item.id);
+                    const canUp = !searching && fullIndex > 0;
+                    const canDown = !searching && fullIndex >= 0 && fullIndex < fullList.length - 1;
+
+                    return (
                     <tr key={item.id} className={adminTableRow}>
                       <td className="px-5 py-3">
                         <div className="flex items-center gap-3">
@@ -218,6 +266,26 @@ export default function ServiceManager() {
                         <div className="flex items-center justify-end gap-1.5">
                           <button
                             type="button"
+                            title="Move up"
+                            aria-label={`Move ${item.name} up`}
+                            disabled={!canUp || reorder.isPending}
+                            className={adminIconBtn}
+                            onClick={() => reorder.mutate({ id: item.id, direction: "up" })}
+                          >
+                            <ChevronUpIcon />
+                          </button>
+                          <button
+                            type="button"
+                            title="Move down"
+                            aria-label={`Move ${item.name} down`}
+                            disabled={!canDown || reorder.isPending}
+                            className={adminIconBtn}
+                            onClick={() => reorder.mutate({ id: item.id, direction: "down" })}
+                          >
+                            <ChevronDownIcon />
+                          </button>
+                          <button
+                            type="button"
                             title="View"
                             aria-label={`View ${item.name}`}
                             className={adminIconBtn}
@@ -252,7 +320,8 @@ export default function ServiceManager() {
                         </div>
                       </td>
                     </tr>
-                  ))}
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

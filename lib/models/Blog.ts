@@ -12,8 +12,14 @@ const BlogSchema = new Schema(
     metaDescription: { type: String, trim: true, default: "" },
     metaKeywords: { type: String, trim: true, default: "" },
     isActive: { type: Boolean, default: true },
+    /** Lower number shows first on the website */
+    sortOrder: { type: Number, default: 100, index: true },
   },
   { timestamps: true },
 );
 
 export const Blog = mongoose.models.Blog ?? mongoose.model("Blog", BlogSchema);
+
+if (!Blog.schema.path("sortOrder")) {
+  Blog.schema.add({ sortOrder: { type: Number, default: 100, index: true } });
+}
