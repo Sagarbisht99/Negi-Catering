@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { menuDishes } from "@/data/menuDishes";
 import { getSiteUrl, mapsHref, site, whatsappHref } from "@/data/site";
 import { faqItems } from "@/data/faq";
 
@@ -8,6 +9,17 @@ export type SeoFields = {
   metaKeywords?: string;
   image?: string;
 };
+
+const AREA_SERVED = [
+  "Delhi NCR",
+  "New Ashok Nagar",
+  "East Delhi",
+  "Noida",
+  "Ghaziabad",
+  "Greater Noida",
+  "Mayur Vihar",
+  "Indirapuram",
+];
 
 export function parseKeywords(value?: string) {
   if (!value?.trim()) return undefined;
@@ -52,9 +64,13 @@ export function buildPageMetadata({
     title: { absolute: fullTitle },
     description,
     keywords: keywordList,
+    authors: [{ name: site.brand.fullName, url: getSiteUrl() }],
+    creator: site.brand.fullName,
+    publisher: site.brand.fullName,
+    category: "Food & Catering",
     alternates: {
       canonical: url,
-      languages: { "en-IN": url, en: url },
+      languages: { "en-IN": url, "hi-IN": url, en: url },
     },
     openGraph: {
       title: fullTitle,
@@ -62,6 +78,7 @@ export function buildPageMetadata({
       url,
       siteName: site.brand.fullName,
       locale: "en_IN",
+      alternateLocale: ["hi_IN"],
       type,
       images: [
         {
@@ -85,6 +102,12 @@ export function buildPageMetadata({
       "max-snippet": -1,
       "max-video-preview": -1,
     },
+    other: {
+      "geo.region": "IN-DL",
+      "geo.placename": site.location.addressLocality,
+      "geo.position": `${site.location.lat};${site.location.lng}`,
+      ICBM: `${site.location.lat}, ${site.location.lng}`,
+    },
   };
 }
 
@@ -102,16 +125,24 @@ export function localBusinessJsonLd() {
     "@type": ["CateringBusiness", "LocalBusiness", "FoodEstablishment"],
     "@id": `${getSiteUrl()}/#business`,
     name: site.brand.fullName,
-    alternateName: ["Negi Caterers", "Negi Caterer", "Negi Tiffin"],
+    alternateName: [
+      "Negi Caterers",
+      "Negi Caterer",
+      "Negi Tiffin",
+      "Negi Caterers and Tiffin Delhi",
+    ],
     description: site.seo.description,
     url: getSiteUrl(),
     telephone: site.contact.phone,
     email: site.contact.email,
     image: [absoluteUrl(site.brand.logo), absoluteUrl(site.brand.ogImage)],
     logo: absoluteUrl(site.brand.logo),
+    slogan: "Home-style catering & tiffin since 1960",
     priceRange: "₹₹",
     currenciesAccepted: "INR",
     paymentAccepted: "Cash, UPI, Bank Transfer",
+    servesCuisine: ["Indian", "North Indian", "Vegetarian"],
+    knowsLanguage: ["en", "hi"],
     address: {
       "@type": "PostalAddress",
       streetAddress: site.location.address,
@@ -126,10 +157,10 @@ export function localBusinessJsonLd() {
       longitude: site.location.lng,
     },
     hasMap: mapsHref(),
-    areaServed: {
+    areaServed: AREA_SERVED.map((name) => ({
       "@type": "Place",
-      name: site.location.label,
-    },
+      name,
+    })),
     foundingDate: String(site.brand.since),
     openingHoursSpecification: {
       "@type": "OpeningHoursSpecification",
@@ -153,12 +184,36 @@ export function localBusinessJsonLd() {
       worstRating: 1,
     },
     sameAs: [site.reviews.googleUrl, whatsappHref()],
-    contactPoint: {
-      "@type": "ContactPoint",
-      telephone: site.contact.phone,
-      contactType: "customer service",
-      areaServed: "IN",
-      availableLanguage: ["English", "Hindi"],
+    contactPoint: [
+      {
+        "@type": "ContactPoint",
+        telephone: site.contact.phone,
+        contactType: "customer service",
+        areaServed: "IN",
+        availableLanguage: ["English", "Hindi"],
+      },
+      {
+        "@type": "ContactPoint",
+        email: site.contact.email,
+        contactType: "customer support",
+        areaServed: "IN",
+        availableLanguage: ["English", "Hindi"],
+      },
+    ],
+    potentialAction: {
+      "@type": "ReserveAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: absoluteUrl("/contact"),
+        actionPlatform: [
+          "http://schema.org/DesktopWebPlatform",
+          "http://schema.org/MobileWebPlatform",
+        ],
+      },
+      result: {
+        "@type": "Reservation",
+        name: "Catering enquiry",
+      },
     },
   };
 }
@@ -169,10 +224,64 @@ export function websiteJsonLd() {
     "@type": "WebSite",
     "@id": `${getSiteUrl()}/#website`,
     name: site.brand.fullName,
+    alternateName: "Negi Caterers",
     url: getSiteUrl(),
     description: site.seo.description,
     publisher: { "@id": `${getSiteUrl()}/#business` },
+    inLanguage: ["en-IN", "hi-IN"],
+    potentialAction: {
+      "@type": "ReadAction",
+      target: [
+        absoluteUrl("/"),
+        absoluteUrl("/services"),
+        absoluteUrl("/blog"),
+        absoluteUrl("/contact"),
+      ],
+    },
+  };
+}
+
+export function webPageJsonLd({
+  path,
+  name,
+  description,
+}: {
+  path: string;
+  name: string;
+  description: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "@id": `${absoluteUrl(path)}#webpage`,
+    url: absoluteUrl(path),
+    name,
+    description,
+    isPartOf: { "@id": `${getSiteUrl()}/#website` },
+    about: { "@id": `${getSiteUrl()}/#business` },
     inLanguage: "en-IN",
+  };
+}
+
+export function menuItemListJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "@id": `${getSiteUrl()}/#menu`,
+    name: `${site.brand.shortName} catering menu highlights`,
+    description:
+      "Popular Indian dishes for house parties, offices, and small gatherings.",
+    numberOfItems: menuDishes.length,
+    itemListElement: menuDishes.map((dish, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      item: {
+        "@type": "MenuItem",
+        name: dish.name,
+        image: absoluteUrl(dish.image),
+        suitableForDiet: "https://schema.org/VegetarianDiet",
+      },
+    })),
   };
 }
 
@@ -215,12 +324,16 @@ export function blogPostingJsonLd(post: {
   createdAt?: string;
   updatedAt?: string;
 }) {
+  const image = post.image.startsWith("http")
+    ? post.image
+    : absoluteUrl(post.image);
+
   return {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
     headline: post.title,
     description: post.excerpt,
-    image: post.image,
+    image,
     articleBody: post.content,
     mainEntityOfPage: absoluteUrl(`/blog/${post.slug}`),
     datePublished: post.createdAt,
@@ -248,12 +361,16 @@ export function serviceJsonLd(service: {
   image: string;
   slug: string;
 }) {
+  const image = service.image.startsWith("http")
+    ? service.image
+    : absoluteUrl(service.image);
+
   return {
     "@context": "https://schema.org",
     "@type": "Service",
     name: service.name,
     description: service.description,
-    image: service.image,
+    image,
     url: absoluteUrl(`/services/${service.slug}`),
     serviceType: "Catering",
     provider: {
@@ -261,6 +378,9 @@ export function serviceJsonLd(service: {
       "@type": "CateringBusiness",
       name: site.brand.fullName,
     },
-    areaServed: site.location.label,
+    areaServed: AREA_SERVED.map((name) => ({
+      "@type": "Place",
+      name,
+    })),
   };
 }

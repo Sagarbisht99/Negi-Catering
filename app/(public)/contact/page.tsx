@@ -1,16 +1,17 @@
 import type { Metadata } from "next";
 import Breadcrumb from "@/components/Breadcrumb";
 import ContactForm from "@/components/ContactForm";
+import JsonLd from "@/components/JsonLd";
 import { citiesLine, emailHref, mapsEmbedSrc, mapsHref, phoneHref, site } from "@/data/site";
-import { buildPageMetadata } from "@/lib/seo";
+import { breadcrumbJsonLd, buildPageMetadata, webPageJsonLd } from "@/lib/seo";
 import Image from "next/image";
 
 export const revalidate = 3600;
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Contact Us",
-  description: `Contact ${site.brand.fullName} for catering quotes, tiffin orders, and event bookings across ${site.location.label}. Call ${site.contact.phoneDisplay} or send an enquiry online.`,
-  keywords: `contact Negi Caterers, catering quote Delhi, tiffin booking, ${site.location.addressLocality}`,
+  description: `Contact ${site.brand.fullName} in New Ashok Nagar for catering quotes, tiffin orders, and event bookings across ${site.location.label}. Call ${site.contact.phoneDisplay} or email ${site.contact.email}.`,
+  keywords: `contact Negi Caterers, catering quote Delhi NCR, tiffin booking New Ashok Nagar, Negi Caterers phone, ${site.location.addressLocality} caterers`,
   path: "/contact",
 });
 
@@ -43,11 +44,24 @@ export default function ContactPage() {
 
   return (
     <div>
+      <JsonLd
+        data={[
+          webPageJsonLd({
+            path: "/contact",
+            name: `Contact Us | ${site.brand.fullName}`,
+            description: `Contact ${site.brand.fullName} in New Ashok Nagar for catering quotes and tiffin bookings across ${site.location.label}.`,
+          }),
+          breadcrumbJsonLd([
+            { name: "Home", path: "/" },
+            { name: "Contact Us", path: "/contact" },
+          ]),
+        ]}
+      />
       <section className="relative overflow-hidden">
         <div className="absolute inset-0">
           <Image
             src="/images/feast.jpg"
-            alt="Catering spread"
+            alt="Catering spread from Negi Caterers and Tiffin"
             fill
             className="object-cover"
             priority

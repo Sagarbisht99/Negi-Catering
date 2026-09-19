@@ -10,8 +10,8 @@ export const revalidate = 300;
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Blog",
-  description: `Tips, menus, and catering ideas from ${site.brand.name} — for weddings, offices, and everyday meals across ${site.location.label}.`,
-  keywords: `catering blog, tiffin tips, wedding catering ideas, ${site.location.label}, ${site.brand.name}`,
+  description: `Tips, menus, and catering ideas from ${site.brand.name} — for parties, offices, and everyday meals across ${site.location.label}.`,
+  keywords: `catering blog, tiffin tips, party catering ideas, ${site.location.label}, ${site.brand.name}`,
   path: "/blog",
 });
 

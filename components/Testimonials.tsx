@@ -42,10 +42,10 @@ const reviews = [
   },
   {
     name: "Aarav Kapoor",
-    role: "Wedding · Delhi NCR",
+    role: "Festival Gathering · Delhi NCR",
     rating: 5,
     image: "https://i.pinimg.com/736x/c4/a9/43/c4a943ad73bafe9e4215f1aeba2cdcfc.jpg",
-    text: "Handled our wedding feast with calm coordination. Guests praised the taste and the service team stayed reachable throughout.",
+    text: "Handled our festive feast with calm coordination. Guests praised the taste and the service team stayed reachable throughout.",
   },
 ];
 
@@ -53,7 +53,7 @@ const rowOne = reviews.slice(0, 3);
 const rowTwo = reviews.slice(3);
 
 export default function Testimonials() {
-  const { rating, count, googleUrl } = site.reviews;
+  const { rating, count } = site.reviews;
 
   return (
     <section className="overflow-hidden border-y border-line bg-ivory-deep/50 py-10 md:py-16">
@@ -70,22 +70,13 @@ export default function Testimonials() {
             Get inspired by these stories.
           </p>
 
-          <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row sm:flex-wrap">
+          <div className="mt-6 flex justify-center">
             <div className="inline-flex max-w-full items-center gap-2 rounded-full bg-card px-3 py-2 shadow-sm ring-1 ring-line sm:px-4">
               <Stars value={rating} size="md" />
               <p className="text-xs font-semibold text-ink sm:text-sm">
                 {rating.toFixed(1)} · {count} reviews on Google
               </p>
             </div>
-            <a
-              href={googleUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-xl bg-terracotta px-4 py-2.5 text-xs font-bold uppercase tracking-wide text-white shadow-sm shadow-terracotta/20 transition hover:bg-terracotta-dark"
-            >
-              See Google reviews
-              <ExternalIcon />
-            </a>
           </div>
         </div>
       </div>
@@ -93,17 +84,6 @@ export default function Testimonials() {
       <div className="mt-10 space-y-4">
         <MarqueeRow items={rowOne} direction="left" />
         <MarqueeRow items={rowTwo} direction="right" />
-      </div>
-
-      <div className="mt-8 flex justify-center px-4">
-        <a
-          href={googleUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="rounded-xl bg-terracotta px-8 py-3 text-sm font-bold text-white transition hover:bg-terracotta-dark"
-        >
-          See All Reviews
-        </a>
       </div>
     </section>
   );
@@ -289,25 +269,6 @@ function GoogleG() {
       <path
         fill="#1976D2"
         d="M43.6 20.1H42V20H24v8h11.3c-.8 2.3-2.3 4.2-4.2 5.6l.1.1 6.3 5.3C39 37.3 44 32 44 24c0-1.3-.1-2.6-.4-3.9z"
-      />
-    </svg>
-  );
-}
-
-function ExternalIcon() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden>
-      <path
-        d="M14 5h5v5M19 5l-9 9"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-      <path
-        d="M10 6H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
       />
     </svg>
   );

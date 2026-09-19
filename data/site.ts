@@ -29,7 +29,7 @@ export const site = {
     phone: "+919315113011",
     /** Display format */
     phoneDisplay: "+91 93151 13011",
-    email: "contact@negicaterer.in",
+    email: "pratyaksh25negi@gmail.com",
     hours: "Mon–Sun · 9:00 AM – 9:00 PM",
     openingHoursSpec: "Mo-Su 09:00-21:00",
   },
@@ -51,11 +51,12 @@ export const site = {
     googleUrl: MAPS_URL,
   },
   seo: {
-    title: "Negi Caterers and Tiffin | Catering & Tiffin in Delhi NCR Since 1960",
+    title:
+      "Negi Caterers and Tiffin | Best Catering & Tiffin Service in Delhi NCR",
     description:
-      "Book Negi Caterers and Tiffin for weddings, house parties, office meals, buffet and daily tiffin across Delhi NCR. Hygienic kitchen, home-style taste — since 1960.",
+      "Negi Caterers and Tiffin in New Ashok Nagar, Delhi NCR — home-style catering for house parties, offices, poojas and festivals. Daily tiffin, buffet menus and hygienic kitchen since 1960. Call +91 93151 13011.",
     keywords:
-      "Negi Caterers, Negi Caterer, catering Delhi NCR, tiffin service Delhi, wedding catering Delhi, buffet catering, office catering, home party catering, pooja prasad, New Ashok Nagar catering, negicaterer.in",
+      "Negi Caterers, Negi Caterer, Negi Tiffin, catering Delhi NCR, tiffin service Delhi, tiffin New Ashok Nagar, buffet catering Delhi, office catering Delhi NCR, house party catering, pooja prasad catering, East Delhi caterers, Noida catering, Ghaziabad catering, hygienic catering Delhi, home style catering, negicaterer.in",
   },
 } as const;
 

@@ -16,8 +16,11 @@ import WhyChooseUs from "@/components/WhyChooseUs";
 import { site } from "@/data/site";
 import {
   buildPageMetadata,
+  breadcrumbJsonLd,
   faqPageJsonLd,
   localBusinessJsonLd,
+  menuItemListJsonLd,
+  webPageJsonLd,
   websiteJsonLd,
 } from "@/lib/seo";
 
@@ -39,7 +42,20 @@ export default async function Home() {
 
   return (
     <>
-      <JsonLd data={[localBusinessJsonLd(), websiteJsonLd(), faqPageJsonLd()]} />
+      <JsonLd
+        data={[
+          localBusinessJsonLd(),
+          websiteJsonLd(),
+          webPageJsonLd({
+            path: "/",
+            name: site.seo.title,
+            description: site.seo.description,
+          }),
+          breadcrumbJsonLd([{ name: "Home", path: "/" }]),
+          menuItemListJsonLd(),
+          faqPageJsonLd(),
+        ]}
+      />
       <Hero />
       <Occasions initialServices={services} />
       <StatsBanner />

@@ -109,7 +109,7 @@ export default function SeoFields({
         <input
           name="metaKeywords"
           defaultValue={defaults?.metaKeywords}
-          placeholder="catering, tiffin, wedding buffet, Delhi NCR"
+          placeholder="catering, tiffin, buffet, Delhi NCR"
           className={adminField}
         />
         <span className="mt-1 block text-[11px] text-zinc-500">

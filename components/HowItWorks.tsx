@@ -2,7 +2,7 @@ const steps = [
   {
     n: "1",
     title: "Tell us your occasion",
-    desc: "Share the date, guest count, and event type — house party, wedding, office, or festival.",
+    desc: "Share the date, guest count, and event type — house party, office, or festival.",
   },
   {
     n: "2",

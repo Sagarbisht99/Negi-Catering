@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { site } from "@/data/site";
-import { buildPageMetadata } from "@/lib/seo";
+import { breadcrumbJsonLd, buildPageMetadata, webPageJsonLd } from "@/lib/seo";
 import Breadcrumb from "@/components/Breadcrumb";
+import JsonLd from "@/components/JsonLd";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -9,8 +10,8 @@ export const revalidate = 3600;
 
 export const metadata: Metadata = buildPageMetadata({
   title: "About Us",
-  description: `${site.brand.fullName} — family catering and tiffin service since ${site.brand.since} across ${site.location.label}. Home-style taste, hygienic kitchen, event-ready service.`,
-  keywords: `about Negi Caterers, catering since ${site.brand.since}, tiffin Delhi NCR, family caterers`,
+  description: `${site.brand.fullName} — trusted family catering and tiffin service since ${site.brand.since} in New Ashok Nagar, ${site.location.label}. Home-style taste, hygienic kitchen, and event-ready service.`,
+  keywords: `about Negi Caterers, Negi Caterers New Ashok Nagar, catering since ${site.brand.since}, tiffin Delhi NCR, family caterers East Delhi`,
   path: "/about",
 });
 
@@ -25,14 +26,14 @@ const values = [
   },
   {
     title: "Event-ready service",
-    desc: "From intimate dinners to weddings — we plan, cook, and present with care.",
+    desc: "From intimate dinners to festive gatherings — we plan, cook, and present with care.",
   },
 ];
 
 const milestones = [
   { year: String(site.brand.since), text: "Family kitchen roots begin" },
   { year: "1990s", text: "Tiffin service expands across the neighbourhood" },
-  { year: "2010s", text: "Full catering for weddings & corporate events" },
+  { year: "2010s", text: "Full catering for parties & corporate events" },
   {
     year: "Today",
     text: `Serving ${site.location.label} with classic & festive menus`,
@@ -42,6 +43,19 @@ const milestones = [
 export default function AboutPage() {
   return (
     <div>
+      <JsonLd
+        data={[
+          webPageJsonLd({
+            path: "/about",
+            name: `About Us | ${site.brand.fullName}`,
+            description: `${site.brand.fullName} — trusted family catering and tiffin service since ${site.brand.since} in New Ashok Nagar, ${site.location.label}.`,
+          }),
+          breadcrumbJsonLd([
+            { name: "Home", path: "/" },
+            { name: "About Us", path: "/about" },
+          ]),
+        ]}
+      />
       <section className="relative overflow-hidden">
         <div className="absolute inset-0">
           <Image
@@ -94,7 +108,7 @@ export default function AboutPage() {
             tempering, and menus that feel like home.
           </p>
           <p className="mt-3 text-sm leading-relaxed text-muted md:text-base">
-            Today we serve house parties, offices, poojas, weddings, and
+            Today we serve house parties, offices, poojas, festivals, and
             festivals with the same care: clear communication, punctual
             delivery, and food that guests remember.
           </p>
