@@ -159,24 +159,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-3 py-10 sm:px-4 md:px-6 md:py-16">
-        <h2 className="font-display text-2xl font-semibold text-ink sm:text-3xl md:text-4xl">
-          Our Journey
-        </h2>
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {milestones.map((m) => (
-            <div
-              key={m.year}
-              className="rounded-2xl bg-card p-5 shadow-sm ring-1 ring-line"
-            >
-              <p className="font-display text-2xl font-semibold text-terracotta">
-                {m.year}
-              </p>
-              <p className="mt-2 text-sm text-muted">{m.text}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+  
 
       <section className="mx-auto max-w-7xl px-3 pb-12 sm:px-4 md:px-6 md:pb-16">
         <div className="overflow-hidden rounded-[24px] bg-terracotta px-5 py-8 text-white sm:rounded-[28px] sm:px-6 md:flex md:items-center md:justify-between md:px-10 md:py-10">

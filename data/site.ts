@@ -10,7 +10,7 @@ const MAPS_URL =
 
 export const site = {
   brand: {
-    shortName: "Negi",
+    shortName: "Negi Caterers and Tiffin",
     name: "Negi Caterers and Tiffin",
     fullName: "Negi Caterers and Tiffin",
     tagline: "Caterers & Tiffin",
