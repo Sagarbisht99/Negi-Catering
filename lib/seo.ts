@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { menuDishes } from "@/data/menuDishes";
-import { getSiteUrl, mapsHref, site, whatsappHref } from "@/data/site";
+import { contactPhones, getSiteUrl, mapsHref, site, whatsappHref } from "@/data/site";
 import { faqItems } from "@/data/faq";
 
 export type SeoFields = {
@@ -173,8 +173,8 @@ export function localBusinessJsonLd() {
         "Saturday",
         "Sunday",
       ],
-      opens: "09:00",
-      closes: "21:00",
+      opens: "08:00",
+      closes: "23:00",
     },
     aggregateRating: {
       "@type": "AggregateRating",
@@ -183,15 +183,15 @@ export function localBusinessJsonLd() {
       bestRating: 5,
       worstRating: 1,
     },
-    sameAs: [site.reviews.googleUrl, whatsappHref()],
+    sameAs: [site.reviews.googleUrl, site.social.instagram, whatsappHref()],
     contactPoint: [
-      {
+      ...contactPhones().map((p) => ({
         "@type": "ContactPoint",
-        telephone: site.contact.phone,
+        telephone: p.phone,
         contactType: "customer service",
         areaServed: "IN",
         availableLanguage: ["English", "Hindi"],
-      },
+      })),
       {
         "@type": "ContactPoint",
         email: site.contact.email,
