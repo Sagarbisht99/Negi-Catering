@@ -29,14 +29,20 @@ export const site = {
     phone: "+919315113011",
     /** Display format */
     phoneDisplay: "+91 93151 13011",
+    /** Alternate line for the same business (E.164 style for tel: links) */
+    phoneAlt: "+919354350373",
+    /** Alternate line, display format */
+    phoneAltDisplay: "+91 93543 50373",
     email: "pratyaksh25negi@gmail.com",
-    hours: "Mon–Sun · 9:00 AM – 9:00 PM",
-    openingHoursSpec: "Mo-Su 09:00-21:00",
+    hours: "Mon–Sun · 8:00 AM – 11:00 PM",
+    openingHoursSpec: "Mo-Su 08:00-23:00",
   },
   location: {
     label: "Delhi NCR",
     address:
       "A-136, New Ashok Nagar Rd, Block A, New Ashok Nagar, New Delhi, Delhi 110096",
+    /** Compact form for narrow columns (footer, cards) */
+    shortAddress: "New Ashok Nagar, New Delhi 110096",
     postalCode: "110096",
     addressRegion: "Delhi",
     addressLocality: "New Ashok Nagar",
@@ -49,6 +55,11 @@ export const site = {
     rating: 4.8,
     count: 128,
     googleUrl: MAPS_URL,
+  },
+  social: {
+    instagram:
+      "https://www.instagram.com/invites/contact/?utm_content=aqj3m62&stkn=81sxwuk2vtq3",
+    instagramHandle: "@negicaterers",
   },
   seo: {
     title:
@@ -68,8 +79,22 @@ export function getSiteUrl() {
   return "http://localhost:3000";
 }
 
-export function phoneHref(phone = site.contact.phone) {
+export function phoneHref(phone: string = site.contact.phone) {
   return `tel:${phone}`;
+}
+
+/** All published phone lines, primary first. */
+export function contactPhones() {
+  return [
+    { phone: site.contact.phone, display: site.contact.phoneDisplay },
+    { phone: site.contact.phoneAlt, display: site.contact.phoneAltDisplay },
+  ] as const;
+}
+
+export function phoneDisplayLine() {
+  return contactPhones()
+    .map((p) => p.display)
+    .join(" · ");
 }
 
 export function emailHref(email = site.contact.email) {

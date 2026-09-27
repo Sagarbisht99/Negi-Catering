@@ -44,11 +44,11 @@ export default async function ServicesPage() {
         <div className="relative mx-auto max-w-7xl px-3 py-14 sm:px-4 md:px-6 md:py-28">
           <Breadcrumb variant="dark" items={[{ name: "Services" }]} />
           <h1 className="mt-3 max-w-2xl font-display text-3xl font-semibold text-white sm:text-4xl md:text-6xl">
-            Catering for every occasion
+            Catering Services in Delhi NCR
           </h1>
           <p className="mt-4 max-w-xl text-sm leading-relaxed text-white/90 md:text-lg">
-            From daily tiffin to festive feasts — choose a service that fits your
-            guest count, venue, and style.
+            Daily tiffin and event catering in New Ashok Nagar, East Delhi, and
+            across Delhi NCR. Choose a service for your occasion and guest count.
           </p>
         </div>
       </section>

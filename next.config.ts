@@ -19,6 +19,16 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "i.pinimg.com" },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.negicaterer.in" }],
+        destination: "https://negicaterer.in/:path*",
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {

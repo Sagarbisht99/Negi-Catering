@@ -102,14 +102,15 @@ export default function AboutPage() {
             Our Story
           </h2>
           <p className="mt-4 text-sm leading-relaxed text-muted md:text-base">
-            we started as a family kitchen in {site.brand.since} has grown into
-            a trusted catering and tiffin service across {site.location.label}. We
-            still cook the way our elders taught us — fresh ingredients, patient
-            tempering, and menus that feel like home.
+            What began as a family kitchen in {site.brand.since} has grown into
+            a trusted catering and tiffin service in New Ashok Nagar and across
+            {" "}{site.location.label}. We still cook the way our elders taught
+            us — with fresh ingredients, patient tempering, and menus that feel
+            like home.
           </p>
           <p className="mt-3 text-sm leading-relaxed text-muted md:text-base">
-            Today we serve house parties, offices, poojas, festivals, and
-            festivals with the same care: clear communication, punctual
+            Today we serve house parties, offices, poojas, and festivals with
+            the same care: clear communication, punctual
             delivery, and food that guests remember.
           </p>
           <p className="mt-3 text-sm leading-relaxed text-muted md:text-base">

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { listPublishedBlogs } from "@/app/actions/blogs";
 import { listPublishedServices } from "@/app/actions/services";
 import BlogSection from "@/components/BlogSection";
+import CollaborationSection from "@/components/CollaborationSection";
 import Faq from "@/components/Faq";
 import Hero from "@/components/Hero";
 import HomeCta from "@/components/HomeCta";
@@ -65,6 +66,7 @@ export default async function Home() {
       <OurStory />
       <BlogSection blogs={blogs} />
       <Testimonials />
+      <CollaborationSection />
       <HomeCta />
       <Faq />
     </>
