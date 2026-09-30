@@ -7,7 +7,20 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/admin", "/admin/"],
+        disallow: [
+          "/admin",
+          "/admin/",
+          "/admin/*",
+          "/api/",
+          "/_next/",
+          "/*?*",
+        ],
+      },
+      {
+        // Ad crawlers do not need to spend budget on admin or query strings.
+        userAgent: ["AdsBot-Google", "AdsBot-Google-Mobile"],
+        allow: "/",
+        disallow: ["/admin", "/api/"],
       },
     ],
     sitemap: `${SITE_ORIGIN}/sitemap.xml`,

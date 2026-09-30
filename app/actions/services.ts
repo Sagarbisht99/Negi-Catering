@@ -21,6 +21,8 @@ export type ServiceRecord = {
   metaKeywords: string;
   isActive: boolean;
   sortOrder: number;
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 function isActiveValue(value: unknown) {

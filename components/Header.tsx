@@ -3,7 +3,7 @@
 import { useEnquiry } from "@/components/EnquiryProvider";
 import EnquiryHangTag from "@/components/EnquiryHangTag";
 import { occasions, type Occasion } from "@/data/occasions";
-import { mapsHref, site } from "@/data/site";
+import { emailHref, mapsHref, phoneHref, site } from "@/data/site";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -23,6 +23,22 @@ export default function Header() {
   const [mobileOccasionsOpen, setMobileOccasionsOpen] = useState(false);
   const [hash, setHash] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!el) return;
+    const sync = () =>
+      document.documentElement.style.setProperty("--header-h", `${el.offsetHeight}px`);
+    sync();
+    const ro = new ResizeObserver(sync);
+    ro.observe(el);
+    window.addEventListener("resize", sync);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", sync);
+    };
+  }, []);
 
   useEffect(() => {
     const sync = () => setHash(window.location.hash);
@@ -82,7 +98,93 @@ export default function Header() {
   };
 
   return (
-    <header className="relative sticky top-0 z-50 overflow-visible border-b border-line/60 bg-ivory/70 backdrop-blur-md">
+    <header
+      ref={headerRef}
+      className="relative sticky top-0 z-50 overflow-visible border-b border-line/60 bg-ivory/70 backdrop-blur-md"
+    >
+      {/* Top contact strip */}
+      <div className="bg-ink text-ivory">
+        <div className="mx-auto flex max-w-7xl items-center justify-center gap-x-5 px-4 py-2.5 text-xs sm:justify-between sm:gap-x-6 sm:px-6 sm:text-[13px] md:py-3 md:text-sm">
+          <a
+            href={mapsHref()}
+            target="_blank"
+            rel="noopener noreferrer"
+            title={site.location.address}
+            className="hidden items-center gap-1.5 text-ivory/75 transition-colors hover:text-terracotta-soft md:inline-flex"
+          >
+            <StripIcon>
+              <path
+                d="M12 21s6-5.8 6-11a6 6 0 1 0-12 0c0 5.2 6 11 6 11Z"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinejoin="round"
+              />
+              <circle cx="12" cy="10" r="2.2" fill="currentColor" />
+            </StripIcon>
+            <span className="truncate">{site.location.shortAddress}</span>
+          </a>
+
+          <div className="flex min-w-0 items-center gap-4 sm:gap-5">
+            <a
+              href={phoneHref(site.contact.phone)}
+              className="inline-flex items-center gap-1.5 font-medium text-ivory transition-colors hover:text-terracotta-soft"
+            >
+              <StripIcon>
+                <path
+                  d="M6.6 10.8a13 13 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.2.4 2.4.6 3.7.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.7 21 3 13.3 3 3.9c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.7.1.4 0 .7-.2 1l-2.3 2.2Z"
+                  fill="currentColor"
+                />
+              </StripIcon>
+              {site.contact.phoneDisplay}
+            </a>
+            <a
+              href={phoneHref(site.contact.phoneAlt)}
+              className="hidden items-center gap-1.5 text-ivory/75 transition-colors hover:text-terracotta-soft sm:inline-flex"
+            >
+              <StripIcon>
+                <path
+                  d="M6.6 10.8a13 13 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.2.4 2.4.6 3.7.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.7 21 3 13.3 3 3.9c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.7.1.4 0 .7-.2 1l-2.3 2.2Z"
+                  fill="currentColor"
+                />
+              </StripIcon>
+              {site.contact.phoneAltDisplay}
+            </a>
+            <a
+              href={emailHref()}
+              className="hidden items-center gap-1.5 text-ivory/75 transition-colors hover:text-terracotta-soft lg:inline-flex"
+            >
+              <StripIcon>
+                <path
+                  d="M4 6h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1Z"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                />
+                <path
+                  d="m3.5 7.5 8.5 6 8.5-6"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </StripIcon>
+              {site.contact.email}
+            </a>
+            <span className="hidden items-center gap-1.5 text-ivory/55 xl:inline-flex">
+              <StripIcon>
+                <circle cx="12" cy="12" r="8.5" stroke="currentColor" strokeWidth="1.8" />
+                <path
+                  d="M12 7.5V12l3 1.8"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                />
+              </StripIcon>
+              {site.contact.hours}
+            </span>
+          </div>
+        </div>
+      </div>
+
       <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2.5 md:gap-5 md:px-6">
         <Link href="/" className="flex shrink-0 items-center gap-1">
           <Image
@@ -291,6 +393,21 @@ export default function Header() {
         </>
       ) : null}
     </header>
+  );
+}
+
+function StripIcon({ children }: { children: React.ReactNode }) {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden
+      className="shrink-0 text-terracotta-soft"
+    >
+      {children}
+    </svg>
   );
 }
 
