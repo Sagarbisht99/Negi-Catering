@@ -21,6 +21,8 @@ const AREA_SERVED = [
   "Indirapuram",
 ];
 
+export const OG_IMAGE = { width: 900, height: 600 };
+
 export function parseKeywords(value?: string) {
   if (!value?.trim()) return undefined;
   const list = value
@@ -59,6 +61,7 @@ export function buildPageMetadata({
     ? image
     : absoluteUrl(image || site.brand.ogImage);
   const keywordList = parseKeywords(keywords) ?? parseKeywords(site.seo.keywords);
+  const declareDefaultSize = ogImage === absoluteUrl(site.brand.ogImage);
 
   return {
     title: { absolute: fullTitle },
@@ -83,9 +86,10 @@ export function buildPageMetadata({
       images: [
         {
           url: ogImage,
-          width: 1200,
-          height: 630,
           alt: fullTitle,
+          ...(declareDefaultSize
+            ? { width: OG_IMAGE.width, height: OG_IMAGE.height }
+            : {}),
         },
       ],
     },
@@ -136,7 +140,13 @@ export function localBusinessJsonLd() {
     telephone: site.contact.phone,
     email: site.contact.email,
     image: [absoluteUrl(site.brand.logo), absoluteUrl(site.brand.ogImage)],
-    logo: absoluteUrl(site.brand.logo),
+    logo: {
+      "@type": "ImageObject",
+      url: absoluteUrl(site.brand.logo),
+      width: 828,
+      height: 765,
+      caption: site.brand.fullName,
+    },
     slogan: "Home-style catering & tiffin since 1960",
     priceRange: "₹₹",
     currenciesAccepted: "INR",

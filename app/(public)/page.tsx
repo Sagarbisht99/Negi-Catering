@@ -19,10 +19,8 @@ import {
   buildPageMetadata,
   breadcrumbJsonLd,
   faqPageJsonLd,
-  localBusinessJsonLd,
   menuItemListJsonLd,
   webPageJsonLd,
-  websiteJsonLd,
 } from "@/lib/seo";
 
 export const revalidate = 300;
@@ -45,8 +43,6 @@ export default async function Home() {
     <>
       <JsonLd
         data={[
-          localBusinessJsonLd(),
-          websiteJsonLd(),
           webPageJsonLd({
             path: "/",
             name: site.seo.title,

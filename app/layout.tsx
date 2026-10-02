@@ -1,8 +1,14 @@
 import type { Metadata, Viewport } from "next";
 import { Rubik } from "next/font/google";
+import JsonLd from "@/components/JsonLd";
 import QueryProvider from "@/components/QueryProvider";
 import { getSiteUrl, site } from "@/data/site";
-import { parseKeywords } from "@/lib/seo";
+import {
+  localBusinessJsonLd,
+  OG_IMAGE,
+  parseKeywords,
+  websiteJsonLd,
+} from "@/lib/seo";
 import "./globals.css";
 
 const rubik = Rubik({
@@ -34,6 +40,7 @@ export const metadata: Metadata = {
   creator: site.brand.fullName,
   publisher: site.brand.fullName,
   category: "Food & Catering",
+  referrer: "origin-when-cross-origin",
   formatDetection: {
     telephone: true,
     email: true,
@@ -56,12 +63,12 @@ export const metadata: Metadata = {
     siteName: site.brand.fullName,
     title: site.seo.title,
     description: site.seo.description,
-    url: "/",
+    url: getSiteUrl(),
     images: [
       {
         url: site.brand.ogImage,
-        width: 1200,
-        height: 630,
+        width: OG_IMAGE.width,
+        height: OG_IMAGE.height,
         alt: site.brand.fullName,
       },
     ],
@@ -80,6 +87,7 @@ export const metadata: Metadata = {
       { url: "/favicon-192.png", sizes: "192x192", type: "image/png" },
       { url: "/favicon-512.png", sizes: "512x512", type: "image/png" },
     ],
+    shortcut: [{ url: "/favicon.ico", sizes: "48x48", type: "image/x-icon" }],
     apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
   },
   manifest: "/manifest.webmanifest",
@@ -105,6 +113,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         className="min-h-full flex flex-col overflow-x-hidden bg-ivory font-sans text-ink"
         suppressHydrationWarning
       >
+        <JsonLd data={[localBusinessJsonLd(), websiteJsonLd()]} />
         <QueryProvider>{children}</QueryProvider>
       </body>
     </html>

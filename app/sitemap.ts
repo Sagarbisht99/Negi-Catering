@@ -40,7 +40,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ]);
 
   const staticRoutes: MetadataRoute.Sitemap = STATIC_ROUTES.map((route) => ({
-    url: `${base}${route.path || "/"}`,
+    url: `${base}${route.path}`,
     lastModified: BUILD_DATE,
     changeFrequency: route.changeFrequency,
     priority: route.priority,
