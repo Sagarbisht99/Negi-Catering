@@ -179,7 +179,11 @@ export default function Footer() {
 
       {/* Bottom Copyright Bar */}
       <div className="border-t border-ivory/10 bg-ink">
-        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-4 text-center text-xs text-ivory/70 md:flex-row md:items-center md:justify-between md:px-6 md:text-left">
+        {/*
+          pb-20 (Mobile/Tablet) aur md:pb-24 (Desktop) add kiya hai taaki slider 
+          ke neeche extra space rahe aur bottom bar completely clear dikhai de.
+        */}
+        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 pt-4 pb-20 text-center text-xs text-ivory/70 md:flex-row md:items-center md:justify-between md:px-6 md:pb-24 md:text-left">
           <p>
             Copyright © {new Date().getFullYear()} {site.brand.name}. All rights reserved.
           </p>
@@ -198,7 +202,7 @@ export default function Footer() {
             ))}
           </div>
           {/* Creator Attribution */}
-          <div className="pt-2 border-t border-ivory/10 md:border-t-0 md:pt-0 md:ml-auto text-ivory/60">
+          <div className="pt-2 border-t border-ivory/10 md:border-t-0 md:pt-0 text-ivory/60">
             Created with ❤️ by{" "}
             <a
               href="https://codewithsagar.online"
