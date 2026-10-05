@@ -179,7 +179,7 @@ export default function Footer() {
 
       {/* Bottom Copyright Bar */}
       <div className="border-t border-ivory/10 bg-ink">
-        <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-4 text-center text-xs text-ivory/70 md:flex-row md:items-center md:justify-between md:px-6 md:text-left">
+        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-4 text-center text-xs text-ivory/70 md:flex-row md:items-center md:justify-between md:px-6 md:text-left">
           <p>
             Copyright © {new Date().getFullYear()} {site.brand.name}. All rights reserved.
           </p>
@@ -196,6 +196,27 @@ export default function Footer() {
                 {l.label}
               </Link>
             ))}
+          </div>
+          {/* Creator Attribution */}
+          <div className="pt-2 border-t border-ivory/10 md:border-t-0 md:pt-0 md:ml-auto text-ivory/60">
+            Created with ❤️ by{" "}
+            <a
+              href="https://codewithsagar.online"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-ivory/80 transition-colors hover:text-terracotta-soft underline decoration-ivory/30 underline-offset-2"
+            >
+              codewithsagar.online
+            </a>{" "}
+            &amp;{" "}
+            <a
+              href="https://weblign.in"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-ivory/80 transition-colors hover:text-terracotta-soft underline decoration-ivory/30 underline-offset-2"
+            >
+              weblign.in
+            </a>
           </div>
         </div>
       </div>
