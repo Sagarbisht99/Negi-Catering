@@ -126,7 +126,7 @@ export function seoDescription(fields: SeoFields, fallback: string) {
 export function localBusinessJsonLd() {
   return {
     "@context": "https://schema.org",
-    "@type": ["CateringBusiness", "LocalBusiness", "FoodEstablishment"],
+    "@type": ["LocalBusiness", "FoodEstablishment"],
     "@id": `${getSiteUrl()}/#business`,
     name: site.brand.fullName,
     alternateName: [
@@ -385,7 +385,7 @@ export function serviceJsonLd(service: {
     serviceType: "Catering",
     provider: {
       "@id": `${getSiteUrl()}/#business`,
-      "@type": "CateringBusiness",
+      "@type": "FoodEstablishment",
       name: site.brand.fullName,
     },
     areaServed: AREA_SERVED.map((name) => ({
