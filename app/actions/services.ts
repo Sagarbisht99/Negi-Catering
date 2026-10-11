@@ -25,6 +25,128 @@ export type ServiceRecord = {
   updatedAt?: string;
 };
 
+const FALLBACK_SERVICES: ServiceRecord[] = [
+  {
+    id: "fallback-daily-tiffin-service",
+    name: "Daily Tiffin Service",
+    slug: "daily-tiffin-service",
+    image: "/images/feast.jpg",
+    description:
+      "Fresh, home-style daily meals planned for working professionals, students, and families in Delhi NCR.",
+    metaTitle: "Daily Tiffin Service in Delhi NCR",
+    metaDescription:
+      "Affordable daily tiffin service with hygienic home-style meals, curated menus, and timely delivery in East Delhi and nearby NCR areas.",
+    metaKeywords:
+      "daily tiffin service, office lunch service Delhi NCR, home style tiffin, tiffin service New Ashok Nagar",
+    isActive: true,
+    sortOrder: 1,
+    createdAt: "2024-01-01T00:00:00.000Z",
+    updatedAt: "2024-01-01T00:00:00.000Z",
+  },
+  {
+    id: "fallback-house-party-catering",
+    name: "House Party Catering",
+    slug: "house-party-catering",
+    image: "/images/feast.jpg",
+    description:
+      "Elegant and comforting menus for intimate family get-togethers, house parties, and festive evenings.",
+    metaTitle: "House Party Catering in Delhi NCR",
+    metaDescription:
+      "Custom house party catering with vegetarian menus, buffet setups, and easy planning for family celebrations and social gatherings.",
+    metaKeywords:
+      "house party catering, family gathering catering, buffet catering Delhi NCR, party menu Delhi",
+    isActive: true,
+    sortOrder: 2,
+    createdAt: "2024-01-02T00:00:00.000Z",
+    updatedAt: "2024-01-02T00:00:00.000Z",
+  },
+  {
+    id: "fallback-corporate-event-catering",
+    name: "Corporate Event Catering",
+    slug: "corporate-event-catering",
+    image: "/images/feast.jpg",
+    description:
+      "Professional catering for office events, meetings, launches, and employee appreciation gatherings.",
+    metaTitle: "Corporate Catering for Events and Offices",
+    metaDescription:
+      "Reliable corporate event catering with efficient service, curated menus, and polished setups for meetings, launches, and team events.",
+    metaKeywords:
+      "corporate event catering, office catering Delhi NCR, team lunch catering, business event catering",
+    isActive: true,
+    sortOrder: 3,
+    createdAt: "2024-01-03T00:00:00.000Z",
+    updatedAt: "2024-01-03T00:00:00.000Z",
+  },
+  {
+    id: "fallback-birthday-party-catering",
+    name: "Birthday Party Catering",
+    slug: "birthday-party-catering",
+    image: "/images/feast.jpg",
+    description:
+      "Celebration-ready menus for birthdays, kids parties, and family milestones across Delhi NCR.",
+    metaTitle: "Birthday Party Catering in Delhi NCR",
+    metaDescription:
+      "Birthday party catering with fun, flavorful menus, attractive presentation, and smooth service for celebrations at home or venue.",
+    metaKeywords:
+      "birthday party catering, kids birthday catering, party food Delhi, celebration catering NCR",
+    isActive: true,
+    sortOrder: 4,
+    createdAt: "2024-01-04T00:00:00.000Z",
+    updatedAt: "2024-01-04T00:00:00.000Z",
+  },
+  {
+    id: "fallback-wedding-catering",
+    name: "Wedding Catering",
+    slug: "wedding-catering",
+    image: "/images/feast.jpg",
+    description:
+      "Large-scale wedding catering with gracious hospitality, festive flavors, and high-volume execution.",
+    metaTitle: "Wedding Catering Service",
+    metaDescription:
+      "Wedding catering designed for elegant traditional meals, multi-course dining, and guest-focused service on your special day.",
+    metaKeywords:
+      "wedding catering, wedding food service Delhi, Indian wedding catering, banquet catering",
+    isActive: true,
+    sortOrder: 5,
+    createdAt: "2024-01-05T00:00:00.000Z",
+    updatedAt: "2024-01-05T00:00:00.000Z",
+  },
+  {
+    id: "fallback-pooja-catering",
+    name: "Pooja Catering",
+    slug: "pooja-catering",
+    image: "/images/feast.jpg",
+    description:
+      "Temple-style prasad, vegetarian meals, and ritual-friendly service for poojas, havans, and spiritual gatherings.",
+    metaTitle: "Pooja Catering in Delhi NCR",
+    metaDescription:
+      "Pooja and festive catering with purity-focused menus, prasad offerings, and thoughtful hospitality for religious occasions.",
+    metaKeywords:
+      "pooja catering, prasad catering Delhi, havan catering, religious event catering",
+    isActive: true,
+    sortOrder: 6,
+    createdAt: "2024-01-06T00:00:00.000Z",
+    updatedAt: "2024-01-06T00:00:00.000Z",
+  },
+  {
+    id: "fallback-festival-catering",
+    name: "Festival Catering",
+    slug: "festival-catering",
+    image: "/images/feast.jpg",
+    description:
+      "Seasonal festival menus and large-batch service for Diwali, Holi, Navratri, and community celebrations.",
+    metaTitle: "Festival Catering Service",
+    metaDescription:
+      "Festive catering with family favorites, bulk menu planning, and warm hospitality for celebrations across Delhi NCR.",
+    metaKeywords:
+      "festival catering, seasonal event catering, community feast Delhi, festive menu planner",
+    isActive: true,
+    sortOrder: 7,
+    createdAt: "2024-01-07T00:00:00.000Z",
+    updatedAt: "2024-01-07T00:00:00.000Z",
+  },
+];
+
 function isActiveValue(value: unknown) {
   return value !== false;
 }
@@ -77,14 +199,15 @@ export async function listPublishedServices(
   limit?: number,
 ): Promise<ServiceRecord[]> {
   try {
-    if (!process.env.MONGODB_URI) return [];
+    if (!process.env.MONGODB_URI) return FALLBACK_SERVICES;
     await dbConnect();
     let query = Service.find({ isActive: { $ne: false } }).sort(serviceListSort);
     if (limit && limit > 0) query = query.limit(limit);
     const rows = await query.lean();
-    return rows.map((row) => normalizeService(serializeDoc<ServiceRecord>(row)));
+    const items = rows.map((row) => normalizeService(serializeDoc<ServiceRecord>(row)));
+    return items.length ? items : FALLBACK_SERVICES;
   } catch {
-    return [];
+    return FALLBACK_SERVICES;
   }
 }
 
@@ -92,7 +215,9 @@ export async function getPublishedServiceBySlug(
   slug: string,
 ): Promise<ServiceRecord | null> {
   try {
-    if (!process.env.MONGODB_URI || !slug) return null;
+    if (!process.env.MONGODB_URI || !slug) {
+      return FALLBACK_SERVICES.find((service) => service.slug === slug) ?? null;
+    }
     await dbConnect();
     const bySlug = await Service.findOne({ slug, isActive: { $ne: false } }).lean();
     if (bySlug) return normalizeService(serializeDoc<ServiceRecord>(bySlug));
@@ -103,9 +228,9 @@ export async function getPublishedServiceBySlug(
       const item = normalizeService(serializeDoc<ServiceRecord>(row));
       if (item.slug === slug) return item;
     }
-    return null;
+    return FALLBACK_SERVICES.find((service) => service.slug === slug) ?? null;
   } catch {
-    return null;
+    return FALLBACK_SERVICES.find((service) => service.slug === slug) ?? null;
   }
 }
 

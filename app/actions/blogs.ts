@@ -26,6 +26,63 @@ export type BlogRecord = {
   updatedAt?: string;
 };
 
+const FALLBACK_BLOGS: BlogRecord[] = [
+  {
+    id: "fallback-why-customized-tiffin-subscriptions-are-better-than-food-delivery-apps",
+    title: "Why Customized Tiffin Subscriptions Are Better Than Food Delivery Apps",
+    slug: "why-customized-tiffin-subscriptions-are-better-than-food-delivery-apps",
+    excerpt:
+      "A better, healthier, and more affordable meal routine can start with a customized tiffin plan.",
+    content:
+      "A customized tiffin plan is more consistent, more affordable, and often more nutritious than random food-delivery orders. It also creates a routine that better suits family schedules, dietary needs, and local preferences.",
+    image: "/images/feast.jpg",
+    metaTitle: "Why Customized Tiffin Subscriptions Are Better Than Food Delivery Apps",
+    metaDescription:
+      "Learn why a customized tiffin plan gives better nutrition, affordability, and consistency than repeated food delivery orders.",
+    metaKeywords: "tiffin subscription, food delivery vs tiffin, customized meals Delhi NCR",
+    isActive: true,
+    sortOrder: 1,
+    createdAt: "2024-01-01T00:00:00.000Z",
+    updatedAt: "2024-01-01T00:00:00.000Z",
+  },
+  {
+    id: "fallback-15-high-tea-snack-ideas-for-kitty-parties-and-social-gatherings",
+    title: "15 High-Tea Snack Ideas for Kitty Parties and Social Gatherings",
+    slug: "15-high-tea-snack-ideas-for-kitty-parties-and-social-gatherings",
+    excerpt:
+      "A collection of elegant and crowd-pleasing high-tea bites that feel special without being too heavy.",
+    content:
+      "High-tea menus work best when they balance texture, color, and lightness. Think mini sandwiches, chaat-inspired bites, baked snacks, wraps, and seasonal fresh fruit platters.",
+    image: "/images/feast.jpg",
+    metaTitle: "High-Tea Snack Ideas for Kitty Parties",
+    metaDescription:
+      "Explore stylish high-tea snack ideas and easy menu planning for kitty parties and small social gatherings.",
+    metaKeywords: "high tea snacks, kitty party menu, social gathering food ideas, tea party snacks",
+    isActive: true,
+    sortOrder: 2,
+    createdAt: "2024-01-02T00:00:00.000Z",
+    updatedAt: "2024-01-02T00:00:00.000Z",
+  },
+  {
+    id: "fallback-monsoon-party-menu-ideas-hot-starters-piping-beverages",
+    title: "Monsoon Party Menu Ideas: Hot Starters & Piping Beverages",
+    slug: "monsoon-party-menu-ideas-hot-starters-piping-beverages",
+    excerpt:
+      "Rainy-day parties feel even better when the menu focuses on cozy starters and comforting drinks.",
+    content:
+      "Monsoon menus work beautifully with piping hot starters, masala chai, refreshing mocktails, and seasonal snacks that feel playful and comforting for guests.",
+    image: "/images/feast.jpg",
+    metaTitle: "Monsoon Party Menu Ideas",
+    metaDescription:
+      "Create a rainy-day celebration menu with hot starters, comforting mains, and refreshing beverages for guests.",
+    metaKeywords: "monsoon party menu, rainy day menu ideas, hot starters, piping beverages",
+    isActive: true,
+    sortOrder: 3,
+    createdAt: "2024-01-03T00:00:00.000Z",
+    updatedAt: "2024-01-03T00:00:00.000Z",
+  },
+];
+
 function isActiveValue(value: unknown) {
   return value !== false;
 }
@@ -74,7 +131,7 @@ function refreshBlogPages(slug?: string) {
 
 export async function listPublishedBlogs(limit?: number): Promise<BlogRecord[]> {
   try {
-    if (!process.env.MONGODB_URI) return [];
+    if (!process.env.MONGODB_URI) return FALLBACK_BLOGS;
     await dbConnect();
     let query = Blog.find({ isActive: { $ne: false } }).sort({
       sortOrder: 1,
@@ -82,9 +139,10 @@ export async function listPublishedBlogs(limit?: number): Promise<BlogRecord[]> 
     });
     if (limit && limit > 0) query = query.limit(limit);
     const rows = await query.lean();
-    return rows.map((row) => normalizeBlog(serializeDoc<BlogRecord>(row)));
+    const items = rows.map((row) => normalizeBlog(serializeDoc<BlogRecord>(row)));
+    return items.length ? items : FALLBACK_BLOGS;
   } catch {
-    return [];
+    return FALLBACK_BLOGS;
   }
 }
 
@@ -92,13 +150,17 @@ export async function getPublishedBlogBySlug(
   slug: string,
 ): Promise<BlogRecord | null> {
   try {
-    if (!process.env.MONGODB_URI || !slug) return null;
+    if (!process.env.MONGODB_URI || !slug) {
+      return FALLBACK_BLOGS.find((blog) => blog.slug === slug) ?? null;
+    }
     await dbConnect();
     const row = await Blog.findOne({ slug, isActive: { $ne: false } }).lean();
-    if (!row) return null;
+    if (!row) {
+      return FALLBACK_BLOGS.find((blog) => blog.slug === slug) ?? null;
+    }
     return normalizeBlog(serializeDoc<BlogRecord>(row));
   } catch {
-    return null;
+    return FALLBACK_BLOGS.find((blog) => blog.slug === slug) ?? null;
   }
 }
 
