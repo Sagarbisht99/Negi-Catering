@@ -246,6 +246,7 @@ export function websiteJsonLd() {
         absoluteUrl("/services"),
         absoluteUrl("/blog"),
         absoluteUrl("/contact"),
+        absoluteUrl("/careers"),
       ],
     },
   };
@@ -392,5 +393,49 @@ export function serviceJsonLd(service: {
       "@type": "Place",
       name,
     })),
+  };
+}
+
+/**
+ * JobPosting structured data for the careers page.
+ * Google uses this to surface open roles — it needs a future validThrough date.
+ */
+export function jobPostingJsonLd({
+  role,
+  description,
+  datePosted,
+  validThrough,
+}: {
+  role: string;
+  description: string;
+  datePosted: string;
+  validThrough: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "JobPosting",
+    title: role,
+    description,
+    datePosted,
+    validThrough,
+    employmentType: "FULL_TIME",
+    directApply: true,
+    hiringOrganization: {
+      "@type": "Organization",
+      name: site.brand.fullName,
+      sameAs: getSiteUrl(),
+      logo: absoluteUrl(site.brand.logo),
+    },
+    jobLocation: {
+      "@type": "Place",
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: site.location.address,
+        addressLocality: site.location.addressLocality,
+        addressRegion: site.location.addressRegion,
+        postalCode: site.location.postalCode,
+        addressCountry: site.location.addressCountry,
+      },
+    },
   };
 }

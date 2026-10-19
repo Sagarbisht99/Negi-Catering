@@ -1,9 +1,12 @@
+import { applicationStatuses, careerRoles } from "@/data/careers";
 import { enquiryStatuses } from "@/data/enquiry";
 import { occasions } from "@/data/occasions";
 import { z } from "zod";
 
 const occasionEnum = z.enum(occasions);
 const statusEnum = z.enum(enquiryStatuses);
+const careerRoleEnum = z.enum(careerRoles);
+const applicationStatusEnum = z.enum(applicationStatuses);
 
 const nameSchema = z
   .string()
@@ -55,6 +58,23 @@ export const enquiryAdminSchema = z.object({
 });
 
 export type EnquiryAdminValues = z.infer<typeof enquiryAdminSchema>;
+
+/** Public careers / job application form (name, contact, role + resume in the action) */
+export const careerFormSchema = z.object({
+  name: nameSchema,
+  email: emailSchema,
+  mobile: mobileSchema,
+  role: careerRoleEnum,
+});
+
+export type CareerFormValues = z.infer<typeof careerFormSchema>;
+
+/** Admin application status update */
+export const applicationStatusSchema = z.object({
+  status: applicationStatusEnum,
+});
+
+export type ApplicationStatusValues = z.infer<typeof applicationStatusSchema>;
 
 const slugFieldSchema = z
   .string()
@@ -124,6 +144,13 @@ export const blogFieldsSchema = z.object({
 export const offerFieldsSchema = z.object({
   isVisible: z.boolean(),
 });
+
+export const galleryFieldsSchema = z.object({
+  caption: z.string().trim().max(160, "Caption is too long (max 160)"),
+  isActive: z.boolean(),
+});
+
+export type GalleryFormValues = z.infer<typeof galleryFieldsSchema>;
 
 export const adminLoginSchema = z.object({
   username: z.string().trim().min(1, "Username is required"),

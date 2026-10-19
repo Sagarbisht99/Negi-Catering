@@ -20,7 +20,9 @@ const PAGE_SIZE = 12;
 const staticPages = [
   { label: "Home", href: "/", blurb: "Hero and highlights" },
   { label: "About Us", href: "/about", blurb: "Our story and journey" },
+  { label: "Careers", href: "/careers", blurb: "Open roles and applications" },
   { label: "Services", href: "/services", blurb: "Catering offerings" },
+  { label: "Gallery", href: "/gallery", blurb: "Photos of our food and events" },
   { label: "Blog", href: "/blog", blurb: "Tips and inspiration" },
   { label: "Contact Us", href: "/contact", blurb: "Enquiry form and location" },
   { label: "FAQ", href: "/#faq", blurb: "Common questions" },

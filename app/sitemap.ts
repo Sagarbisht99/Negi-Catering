@@ -24,8 +24,10 @@ const STATIC_ROUTES: {
 }[] = [
   { path: "", changeFrequency: "weekly", priority: 1 },
   { path: "/services", changeFrequency: "weekly", priority: 0.95 },
+  { path: "/gallery", changeFrequency: "weekly", priority: 0.7 },
   { path: "/contact", changeFrequency: "monthly", priority: 0.9 },
   { path: "/about", changeFrequency: "monthly", priority: 0.8 },
+  { path: "/careers", changeFrequency: "monthly", priority: 0.6 },
   { path: "/blog", changeFrequency: "daily", priority: 0.8 },
   { path: "/sitemap", changeFrequency: "weekly", priority: 0.4 },
   { path: "/terms", changeFrequency: "yearly", priority: 0.3 },

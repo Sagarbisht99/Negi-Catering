@@ -1,6 +1,7 @@
 "use client";
 
 import { listPublishedBlogs } from "@/app/actions/blogs";
+import { submitApplication } from "@/app/actions/applications";
 import { submitEnquiry, type EnquiryInput } from "@/app/actions/enquiries";
 import { getVisibleOffer } from "@/app/actions/offers";
 import { listPublishedServices } from "@/app/actions/services";
@@ -42,5 +43,11 @@ export function useVisibleOffer() {
 export function useSubmitEnquiry() {
   return useMutation({
     mutationFn: (input: EnquiryInput) => submitEnquiry(input),
+  });
+}
+
+export function useSubmitApplication() {
+  return useMutation({
+    mutationFn: (formData: FormData) => submitApplication(formData),
   });
 }

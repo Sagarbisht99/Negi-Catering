@@ -10,6 +10,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 const nav = [
+  { label: "Gallery", href: "/gallery" },
   { label: "About Us", href: "/about" },
   { label: "FAQ", href: "/#faq" },
   { label: "Contact Us", href: "/contact" },
