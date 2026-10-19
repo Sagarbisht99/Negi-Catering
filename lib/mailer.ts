@@ -337,3 +337,162 @@ export async function sendEnquiryEmail(data: EnquiryMailPayload) {
     }
   }
 }
+
+/* -------------------------------------------------------------------------- */
+/*                       Job applications (careers page)                      */
+/* -------------------------------------------------------------------------- */
+
+export type ApplicationMailPayload = {
+  name: string;
+  email: string;
+  mobile: string;
+  role: string;
+  resumeUrl: string;
+  resumeName: string;
+};
+
+function applicationDetailsCard(data: ApplicationMailPayload) {
+  const resumeHref = /^https?:\/\//i.test(data.resumeUrl)
+    ? data.resumeUrl
+    : `https://${data.resumeUrl}`;
+
+  return `
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${BRAND.ivory};border:1px solid ${BRAND.line};border-radius:4px">
+      <tr>
+        <td style="padding:8px 24px 4px">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+            ${detailRow("Name", escapeHtml(data.name))}
+            ${detailRow(
+              "Email",
+              `<a href="mailto:${escapeHtml(data.email)}" style="color:${BRAND.terracotta};text-decoration:none">${escapeHtml(data.email)}</a>`,
+            )}
+            ${detailRow(
+              "Mobile",
+              `<a href="tel:${escapeHtml(data.mobile)}" style="color:${BRAND.terracotta};text-decoration:none">${escapeHtml(data.mobile)}</a>`,
+            )}
+            ${detailRow("Role applied", escapeHtml(data.role))}
+            ${detailRow(
+              "Resume",
+              `<a href="${escapeHtml(resumeHref)}" style="color:${BRAND.terracotta};text-decoration:none;font-weight:600">${escapeHtml(data.resumeName || "Download resume")}</a>`,
+              true,
+            )}
+          </table>
+        </td>
+      </tr>
+    </table>
+  `;
+}
+
+function applicationActionButtons(data: ApplicationMailPayload) {
+  const tel = data.mobile.replace(/\s+/g, "");
+  const resumeHref = /^https?:\/\//i.test(data.resumeUrl)
+    ? data.resumeUrl
+    : `https://${data.resumeUrl}`;
+
+  return `
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:28px">
+      <tr>
+        <td style="padding-right:10px">
+          <a href="${escapeHtml(resumeHref)}" style="display:inline-block;background:${BRAND.terracotta};color:${BRAND.white};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:13px;font-weight:600;letter-spacing:0.04em;text-decoration:none;padding:12px 22px;border-radius:3px">
+            View resume
+          </a>
+        </td>
+        <td style="padding-right:10px">
+          <a href="tel:${escapeHtml(tel)}" style="display:inline-block;background:${BRAND.white};color:${BRAND.ink};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:13px;font-weight:600;letter-spacing:0.04em;text-decoration:none;padding:11px 22px;border-radius:3px;border:1px solid ${BRAND.line}">
+            Call applicant
+          </a>
+        </td>
+        <td>
+          <a href="mailto:${escapeHtml(data.email)}" style="display:inline-block;background:${BRAND.white};color:${BRAND.ink};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:13px;font-weight:600;letter-spacing:0.04em;text-decoration:none;padding:11px 22px;border-radius:3px;border:1px solid ${BRAND.line}">
+            Reply by email
+          </a>
+        </td>
+      </tr>
+    </table>
+  `;
+}
+
+/** Email the admin inbox about a new job application + confirm to the applicant. */
+export async function sendApplicationEmail(data: ApplicationMailPayload) {
+  if (!isMailConfigured()) {
+    throw new Error("Resend is not configured. Add RESEND_API_KEY in .env");
+  }
+
+  const adminTo = env("CAREER_TO_EMAIL") || env("ENQUIRY_TO_EMAIL");
+  if (!adminTo) {
+    throw new Error("CAREER_TO_EMAIL or ENQUIRY_TO_EMAIL is missing in .env");
+  }
+
+  const from = getFromAddress();
+
+  await sendWithResend({
+    from,
+    to: adminTo,
+    replyTo: data.email,
+    subject: `New job application · ${data.role} · ${data.name}`,
+    text: [
+      "New job application (careers page)",
+      "",
+      `Name: ${data.name}`,
+      `Email: ${data.email}`,
+      `Mobile: ${data.mobile}`,
+      `Role applied: ${data.role}`,
+      `Resume: ${data.resumeUrl}`,
+      "",
+      "Also saved in Admin → Applications",
+    ].join("\n"),
+    html: emailShell({
+      preheader: `${data.name} applied for the ${data.role} role.`,
+      eyebrow: "New application",
+      title: "A new candidate has applied",
+      subtitle: `Received from the careers page. Details and resume are below — also saved in Admin → Applications.`,
+      bodyHtml: `
+        ${applicationDetailsCard(data)}
+        ${applicationActionButtons(data)}
+      `,
+      footerNote: "Reply to this email to contact the applicant directly.",
+    }),
+  });
+
+  if (data.email.toLowerCase() !== adminTo.toLowerCase()) {
+    try {
+      await sendWithResend({
+        from,
+        to: data.email,
+        subject: `We received your application · ${site.brand.name}`,
+        text: [
+          `Hi ${data.name},`,
+          "",
+          `Thank you for applying for the ${data.role} role at ${site.brand.name}.`,
+          "We have received your application and our team will review it shortly.",
+          "",
+          `— ${site.brand.name}`,
+          site.contact.phoneDisplay,
+          site.contact.email,
+        ].join("\n"),
+        html: emailShell({
+          preheader: `Thank you, ${data.name}. We received your ${data.role} application.`,
+          eyebrow: "Application received",
+          title: `Thank you, ${escapeHtml(data.name)}`,
+          subtitle: `We have received your application for the <strong>${escapeHtml(data.role)}</strong> role and our team will review it shortly. ${site.brand.sinceLabel} — cooking and serving across ${site.location.label}.`,
+          bodyHtml: `
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${BRAND.ivory};border:1px solid ${BRAND.line};border-radius:4px">
+              <tr>
+                <td style="padding:22px 24px">
+                  <div style="font-family:Georgia,'Times New Roman',serif;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:${BRAND.gold};margin-bottom:10px">
+                    Application summary
+                  </div>
+                  <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:12px;color:${BRAND.muted};margin-bottom:4px">Role applied</div>
+                  <div style="font-family:Georgia,'Times New Roman',serif;font-size:19px;color:${BRAND.ink};line-height:1.35">${escapeHtml(data.role)}</div>
+                </td>
+              </tr>
+            </table>
+          `,
+          footerNote: `Questions? Call us at <a href="tel:${escapeHtml(site.contact.phone)}" style="color:${BRAND.terracotta};text-decoration:none">${escapeHtml(site.contact.phoneDisplay)}</a>`,
+        }),
+      });
+    } catch (err) {
+      console.warn("Applicant confirmation email skipped:", err);
+    }
+  }
+}

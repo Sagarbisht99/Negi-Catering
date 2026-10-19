@@ -6,6 +6,8 @@ const FOLDERS = {
   services: "/negi-catering/services",
   blogs: "/negi-catering/blogs",
   offers: "/negi-catering/offers",
+  careers: "/negi-catering/careers",
+  gallery: "/negi-catering/gallery",
 } as const;
 
 export type ImageKitFolder = keyof typeof FOLDERS;
@@ -107,8 +109,90 @@ export async function deleteImage(fileId?: string | null) {
   }
 }
 
+const RESUME_MAX_BYTES = 5_000_000;
+const RESUME_EXTENSIONS = ["pdf", "doc", "docx"] as const;
+
+/** Resume / CV upload for job applications — PDF or Word only. */
+export async function uploadResume(
+  file: File | null,
+  maxBytes = RESUME_MAX_BYTES,
+) {
+  console.log(
+    "[uploadResume]",
+    file ? { name: file.name, size: file.size, type: file.type || "(empty)" } : null,
+  );
+
+  if (!file || file.size === 0) {
+    throw new Error("Please attach your resume (PDF, DOC, or DOCX)");
+  }
+
+  if (file.size > maxBytes) {
+    throw new Error(
+      `Resume must be ${Math.round(maxBytes / 1_000_000)}MB or smaller`,
+    );
+  }
+
+  const extension =
+    RESUME_EXTENSIONS.find(
+      (ext) => file.name.toLowerCase().endsWith(`.${ext}`),
+    ) ?? "";
+
+  if (!extension) {
+    throw new Error("Resume must be a PDF, DOC, or DOCX file");
+  }
+
+  if (!isImageKitConfigured()) {
+    throw new Error("ImageKit credentials are not configured in env.");
+  }
+
+  const fileName = `resume-${Date.now()}.${extension}`;
+  const mime =
+    file.type ||
+    (extension === "pdf"
+      ? "application/pdf"
+      : "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+
+  try {
+    const uploadFile = await toFile(await file.arrayBuffer(), fileName, {
+      type: mime,
+    });
+    const response = await getImageKit().files.upload({
+      file: uploadFile,
+      fileName,
+      folder: FOLDERS.careers,
+    });
+
+    if (!response.url) {
+      throw new Error("Resume upload failed");
+    }
+
+    console.log("[uploadResume] ok", response.url);
+    return {
+      url: response.url,
+      fileId: response.fileId,
+      name: file.name,
+      size: file.size,
+    };
+  } catch (err) {
+    console.error("[ImageKit]", err);
+    const message = err instanceof Error ? err.message : "Resume upload failed";
+    if (message.toLowerCase().includes("connection")) {
+      throw new Error("Could not reach the file server. Check internet and try again.");
+    }
+    throw new Error(message);
+  }
+}
+
+export const deleteResumeFile = deleteImage;
+
 // Backwards-compatible helpers for offers
 export const uploadOfferImage = (file: File | null, fallback = "") =>
   uploadImage(file, "offers", "offer", fallback);
 
 export const deleteOfferImage = deleteImage;
+
+/** Gallery upload — images only, enforced by uploadImage(). */
+export const uploadGalleryImage = (file: File | null, fallback = "") =>
+  uploadImage(file, "gallery", "gallery", fallback);
+
+export const deleteGalleryImage = deleteImage;

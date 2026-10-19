@@ -1,7 +1,9 @@
 "use client";
 
+import { listApplications } from "@/app/actions/applications";
 import { listBlogs } from "@/app/actions/blogs";
 import { listEnquiries } from "@/app/actions/enquiries";
+import { listGallery } from "@/app/actions/gallery";
 import { listOffers } from "@/app/actions/offers";
 import { listServices } from "@/app/actions/services";
 import { adminPanel } from "@/components/admin/adminStyles";
@@ -16,10 +18,22 @@ const cards = [
     queryFn: listEnquiries,
   },
   {
+    title: "Applications",
+    href: "/admin/applications",
+    queryKey: ["applications"] as const,
+    queryFn: listApplications,
+  },
+  {
     title: "Services",
     href: "/admin/services",
     queryKey: ["services"] as const,
     queryFn: listServices,
+  },
+  {
+    title: "Gallery",
+    href: "/admin/gallery",
+    queryKey: ["gallery"] as const,
+    queryFn: listGallery,
   },
   {
     title: "Blogs",
@@ -37,15 +51,19 @@ const cards = [
 
 export default function DashboardStats() {
   const enquiries = useQuery({ queryKey: cards[0].queryKey, queryFn: cards[0].queryFn });
-  const services = useQuery({ queryKey: cards[1].queryKey, queryFn: cards[1].queryFn });
-  const blogs = useQuery({ queryKey: cards[2].queryKey, queryFn: cards[2].queryFn });
-  const offers = useQuery({ queryKey: cards[3].queryKey, queryFn: cards[3].queryFn });
+  const applications = useQuery({ queryKey: cards[1].queryKey, queryFn: cards[1].queryFn });
+  const services = useQuery({ queryKey: cards[2].queryKey, queryFn: cards[2].queryFn });
+  const gallery = useQuery({ queryKey: cards[3].queryKey, queryFn: cards[3].queryFn });
+  const blogs = useQuery({ queryKey: cards[4].queryKey, queryFn: cards[4].queryFn });
+  const offers = useQuery({ queryKey: cards[5].queryKey, queryFn: cards[5].queryFn });
 
   const stats = [
     { ...cards[0], query: enquiries },
-    { ...cards[1], query: services },
-    { ...cards[2], query: blogs },
-    { ...cards[3], query: offers },
+    { ...cards[1], query: applications },
+    { ...cards[2], query: services },
+    { ...cards[3], query: gallery },
+    { ...cards[4], query: blogs },
+    { ...cards[5], query: offers },
   ];
 
   return (
@@ -53,11 +71,12 @@ export default function DashboardStats() {
       <div>
         <h1 className="text-2xl font-semibold text-white">Dashboard</h1>
         <p className="mt-1 text-sm text-zinc-500">
-          Overview of enquiries, services, blogs, and the offer banner.
+          Overview of enquiries, applications, services, gallery, blogs, and the
+          offer banner.
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6">
         {stats.map((card) => (
           <Link
             key={card.title}

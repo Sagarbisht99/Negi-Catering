@@ -11,6 +11,8 @@ import { useEffect, useRef, useState, useTransition } from "react";
 const links = [
   { href: "/admin/dashboard", label: "Dashboard", icon: HomeIcon },
   { href: "/admin/enquiries", label: "Enquiries", icon: EnquiryIcon },
+  { href: "/admin/applications", label: "Applications", icon: CareerIcon },
+  { href: "/admin/gallery", label: "Gallery", icon: GalleryIcon },
   { href: "/admin/services", label: "Services", icon: ServiceIcon },
   { href: "/admin/blogs", label: "Blogs", icon: BlogIcon },
   { href: "/admin/offers", label: "Offer Banner", icon: OfferIcon },
@@ -19,6 +21,8 @@ const links = [
 const titles: Record<string, { title: string; subtitle: string }> = {
   "/admin/dashboard": { title: "Dashboard", subtitle: "Overview of your catering" },
   "/admin/enquiries": { title: "Enquiries", subtitle: "Website leads" },
+  "/admin/applications": { title: "Applications", subtitle: "Careers page applicants" },
+  "/admin/gallery": { title: "Gallery", subtitle: "Photos shown on the website" },
   "/admin/services": { title: "Services", subtitle: "Manage offerings" },
   "/admin/blogs": { title: "Blogs", subtitle: "Posts and SEO" },
   "/admin/offers": { title: "Offer banner", subtitle: "ImageKit popup" },
@@ -264,6 +268,26 @@ function EnquiryIcon({ active }: { active?: boolean }) {
         strokeWidth="1.7"
         strokeLinejoin="round"
       />
+    </svg>
+  );
+}
+
+function CareerIcon({ active }: { active?: boolean }) {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden className={active ? "text-white" : ""}>
+      <rect x="3.5" y="7.5" width="17" height="12" rx="2" stroke="currentColor" strokeWidth="1.7" />
+      <path d="M9 7.5V6a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 15 6v1.5" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round" />
+      <path d="M3.5 12.5h17" stroke="currentColor" strokeWidth="1.7" />
+    </svg>
+  );
+}
+
+function GalleryIcon({ active }: { active?: boolean }) {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden className={active ? "text-white" : ""}>
+      <rect x="3.5" y="4.5" width="17" height="15" rx="2" stroke="currentColor" strokeWidth="1.7" />
+      <circle cx="9" cy="9.5" r="1.6" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M4.5 17.5 9.5 13l3 2.6 3.2-3.1 4 4.2" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }

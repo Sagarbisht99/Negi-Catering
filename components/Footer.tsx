@@ -5,12 +5,14 @@ import Link from "next/link";
 export default function Footer() {
   const explore = [
     { label: "Services", href: "/services" },
+    { label: "Gallery", href: "/gallery" },
     { label: "Blog", href: "/blog" },
     { label: "FAQ", href: "/#faq" },
   ];
 
   const company = [
     { label: "About Us", href: "/about" },
+    { label: "Careers", href: "/careers" },
     { label: "Contact Us", href: "/contact" },
     { label: "Get a Quote", href: "/contact" },
   ];

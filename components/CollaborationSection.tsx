@@ -1,5 +1,6 @@
 import { emailHref, phoneHref, site } from "@/data/site";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function CollaborationSection() {
   return (
@@ -56,8 +57,30 @@ export default function CollaborationSection() {
               </a>
             </div>
           </div>
+
+          <Link
+            href="/careers"
+            className="mt-6 inline-flex w-fit items-center gap-2 rounded-full bg-terracotta px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white shadow-sm shadow-terracotta/25 transition hover:bg-terracotta-dark"
+          >
+            We&apos;re hiring — view careers
+            <ArrowIcon />
+          </Link>
         </div>
       </div>
     </section>
+  );
+}
+
+function ArrowIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path
+        d="M5 12h14M13 6l6 6-6 6"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }
