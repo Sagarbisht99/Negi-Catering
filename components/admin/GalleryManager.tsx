@@ -376,12 +376,19 @@ export default function GalleryManager() {
               maxBytes={5_000_000}
               onFileSelect={setImageFile}
             />
-            <input
-              name="caption"
-              defaultValue={editing?.caption ?? ""}
-              placeholder="Caption (optional)"
-              className={adminField}
-            />
+            <label htmlFor="gallery-caption" className="block">
+              <span className="mb-1.5 block text-xs font-medium text-zinc-400">
+                Image title / caption
+              </span>
+              <input
+                id="gallery-caption"
+                name="caption"
+                defaultValue={editing?.caption ?? ""}
+                placeholder="e.g. Wedding buffet setup"
+                maxLength={160}
+                className={adminField}
+              />
+            </label>
             <label className="flex items-center gap-2 text-sm text-zinc-300">
               <input
                 type="checkbox"

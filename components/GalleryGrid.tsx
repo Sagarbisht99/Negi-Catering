@@ -49,26 +49,27 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
     <>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
         {items.map((item, index) => (
-          <button
-            key={item.id}
-            type="button"
-            onClick={() => setActive(index)}
-            aria-label={item.caption || `Open gallery image ${index + 1}`}
-            className="group relative aspect-square overflow-hidden rounded-xl bg-ivory-deep ring-1 ring-line transition hover:ring-terracotta/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-terracotta"
-          >
-            <Image
-              src={item.image}
-              alt={item.caption || `Negi Caterers gallery image ${index + 1}`}
-              fill
-              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
-            />
+          <div key={item.id} className="min-w-0">
+            <button
+              type="button"
+              onClick={() => setActive(index)}
+              aria-label={item.caption || `Open gallery image ${index + 1}`}
+              className="group relative block aspect-square w-full overflow-hidden rounded-xl bg-ivory-deep ring-1 ring-line transition hover:ring-terracotta/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-terracotta"
+            >
+              <Image
+                src={item.image}
+                alt={item.caption || `Negi Caterers gallery image ${index + 1}`}
+                fill
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                className="object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+            </button>
             {item.caption ? (
-              <span className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/80 to-transparent px-3 pt-8 pb-2.5 text-left text-xs font-semibold text-white opacity-0 transition-opacity group-hover:opacity-100">
+              <p className="mt-2 line-clamp-2 text-sm font-semibold leading-5 text-ink">
                 {item.caption}
-              </span>
+              </p>
             ) : null}
-          </button>
+          </div>
         ))}
       </div>
 
